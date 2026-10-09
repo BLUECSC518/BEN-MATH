@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="小邦邦數學冒險">
+<meta name="theme-color" content="#f6f1e7">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>小邦邦數學冒險 v7</title>
+<style>
+:root{
+ --bg:#f6f1e7;--card:#fffdf8;--ink:#17324d;--muted:#6d7782;--line:#d8d0c2;
+ --accent:#d88a2d;--accent2:#2f706e;--good:#2f7a4e;--bad:#a64646;--gold:#c99119;
+ --shadow:0 10px 28px rgba(41,52,63,.09);
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;background:linear-gradient(#faf6ed,#f2ecdf);color:var(--ink);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+ -webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+.wrap{max-width:980px;margin:auto;padding:16px 14px 42px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:clamp(27px,5vw,44px);margin:0}
+.sub{color:var(--muted);margin-top:4px}
+.wallet{display:flex;align-items:center;gap:8px;background:#fff7dd;border:1px solid #ead39c;border-radius:999px;padding:9px 14px;font-weight:900}
+.top-grid{display:grid;grid-template-columns:220px 1fr;gap:14px;margin:16px 0}
+.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.avatar-panel{padding:12px;text-align:center}
+.avatar-name{font-weight:900;margin-top:4px}
+.avatar-title{font-size:13px;color:var(--muted)}
+.avatar{width:150px;height:155px;margin:0 auto;position:relative}
+.avatar svg{width:100%;height:100%;display:block}
+.avatar .hat{position:absolute;left:50%;top:-3px;transform:translateX(-50%);font-size:44px;z-index:3;line-height:1}
+.avatar .acc{position:absolute;right:2px;top:73px;font-size:40px;z-index:3;transform:rotate(-8deg)}
+.avatar .chest{position:absolute;left:50%;top:92px;transform:translateX(-50%);font-size:24px;z-index:2}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.stat{padding:12px 8px;text-align:center}
+.stat span{display:block;color:var(--muted);font-size:13px}
+.stat b{font-size:21px;display:block;margin-top:3px}
+.progress{height:12px;background:#e5dfd5;border-radius:999px;overflow:hidden;margin-top:12px}
+.progress div{height:100%;background:linear-gradient(90deg,var(--accent),#e9b966);transition:.25s}
+.tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 10px}
+.tab{white-space:nowrap;border:1px solid var(--line);background:var(--card);padding:10px 14px;border-radius:14px;font-weight:800}
+.tab.active{background:var(--ink);color:white;border-color:var(--ink)}
+.screen{display:none}.screen.active{display:block}
+.map{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
+.node{padding:10px 6px;border:1px solid var(--line);border-radius:15px;background:var(--card);text-align:center;font-size:12px}
+.node .ico{font-size:24px}.node.active{outline:2px solid var(--accent);background:#fff7e9}.node.done{background:#eef8f2;border-color:#9dcdb0}
+.game{padding:18px}
+.meta{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#edf4f3;color:var(--accent2);font-size:13px;font-weight:900}
+.source{font-size:12px;color:var(--muted)}
+.boss{display:none;margin:12px 0;padding:11px 13px;background:#fff1ee;border:1px solid #e8c0b7;border-radius:15px}
+.boss-line{display:flex;gap:10px;align-items:center}.boss-face{font-size:34px}
+.hp{height:13px;flex:1;background:#ead6d1;border-radius:99px;overflow:hidden}.hp div{height:100%;background:#a64646;transition:.25s}
+.question{font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.45;margin:14px 0}
+.visual{margin:8px auto 15px;max-width:600px}.visual svg{width:100%;height:auto;display:block}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.choice{min-height:62px;border:2px solid var(--line);border-radius:17px;background:white;padding:13px 15px;text-align:left;font-size:17px;font-weight:800}
+.choice:active{transform:scale(.99)}.choice.correct{background:#edf8f1;border-color:var(--good)}.choice.wrong{background:#fff0f0;border-color:var(--bad)}.choice:disabled{opacity:.7}
+.feedback{min-height:38px;margin-top:13px;font-weight:900;line-height:1.5}
+.hint{display:none;background:#fff6e4;border:1px dashed #d6a54d;border-radius:14px;padding:11px 13px;line-height:1.6;color:#654a25}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.btn{border:0;min-height:47px;border-radius:14px;padding:11px 15px;font-weight:900}
+.primary{background:var(--accent);color:white}.secondary{background:#edf0f2}.ghost{background:transparent;border:1px solid var(--line)}
+.reward-note{font-size:13px;color:var(--muted);margin-top:10px}
+.shop-head,.wardrobe-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.item{padding:13px;text-align:center}.item-icon{font-size:42px;min-height:52px}.item-name{font-weight:900}.item-type{font-size:12px;color:var(--muted);margin:3px 0 8px}.price{color:#8a6515;font-weight:900}
+.item button{width:100%;margin-top:8px}.item.owned{border-color:#9dcdb0}.item.equipped{outline:2px solid var(--accent2)}
+.wardrobe-layout{display:grid;grid-template-columns:260px 1fr;gap:14px}
+.wardrobe-preview{padding:18px;text-align:center}.wardrobe-preview .avatar{width:210px;height:220px}
+.owned-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.owned-btn{border:1px solid var(--line);background:white;border-radius:14px;padding:10px;text-align:left;min-height:56px}.owned-btn.on{border:2px solid var(--accent2);background:#eef6f5}
+.wrong-list{display:grid;gap:9px}.wrong-item{padding:13px}.wrong-item b{display:block;margin-bottom:5px}.tiny{font-size:12px;color:var(--muted)}
+.empty{text-align:center;padding:28px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(20,31,43,.42);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
+.modal.show{display:flex}.modal-card{max-width:390px;width:100%;background:var(--card);border-radius:24px;padding:22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.chest{font-size:64px}.coin-big{font-size:34px;font-weight:1000;color:#9b7014}
+.result{padding:28px;text-align:center}.result .trophy{font-size:64px}.result h2{font-size:30px;margin:8px}
+.mode-note{padding:12px 14px;border-radius:15px;background:#eef4f3;color:#315c5a;font-size:14px;line-height:1.5;margin-bottom:12px}
+@media(max-width:760px){
+ .top-grid{grid-template-columns:1fr}.avatar-panel{display:flex;align-items:center;text-align:left}.avatar-panel .avatar{width:120px;height:125px;margin:0}
+ .avatar-info{flex:1}.stats{grid-template-columns:repeat(2,1fr)}.map{grid-template-columns:repeat(3,1fr)}
+ .choices{grid-template-columns:1fr}.shop-grid{grid-template-columns:repeat(2,1fr)}.wardrobe-layout{grid-template-columns:1fr}
+}
+@media(max-width:430px){.shop-grid{grid-template-columns:1fr}.owned-list{grid-template-columns:1fr}}
+</style>
+
+<style id="phone-first-overrides">
+@media (max-width: 640px){
+  body{padding-bottom:86px}
+  .wrap{padding:10px 10px 24px}
+  header{align-items:center}
+  header h1{font-size:26px}
+  .sub{font-size:13px}
+  .wallet{padding:8px 12px;font-size:14px}
+  .top-grid{display:block;margin:10px 0}
+  .avatar-panel{display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:8px;text-align:left}
+  .avatar-panel .avatar{width:78px;height:82px;margin:0}
+  .avatar-panel .avatar .hat{font-size:28px;top:-2px}
+  .avatar-panel .avatar .acc{font-size:26px;top:40px;right:-2px}
+  .avatar-panel .avatar .chest{font-size:16px;top:48px}
+  .avatar-name{font-size:15px}.avatar-title{font-size:11px}
+  .stats{grid-template-columns:repeat(4,1fr);gap:5px}
+  .stat{padding:7px 3px;border-radius:12px}
+  .stat span{font-size:10px}.stat b{font-size:15px}
+  .progress{height:8px;margin:8px 0 10px}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;background:rgba(255,253,248,.97);border-top:1px solid var(--line);padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));display:grid;grid-template-columns:repeat(4,1fr);gap:5px;overflow:visible;box-shadow:0 -5px 20px rgba(30,45,60,.08)}
+  .tab{white-space:normal;padding:8px 2px;border-radius:11px;font-size:12px;min-height:48px}
+  .tab.active{background:var(--ink);color:#fff}
+  .mode-note{font-size:12px;padding:9px 10px;margin-bottom:8px}
+  .map{grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:8px}
+  .node{padding:6px 2px;border-radius:10px;font-size:9px;min-width:0}
+  .node .ico{font-size:18px}.node b{display:none}
+  .game{padding:13px;border-radius:18px}
+  .meta{gap:5px}.badge{font-size:11px;padding:5px 8px}.source{font-size:10px}
+  .question{font-size:22px;line-height:1.42;margin:11px 0 13px}
+  .visual{margin:5px auto 10px}
+  .choices{grid-template-columns:1fr;gap:8px}
+  .choice{min-height:58px;padding:12px 13px;border-radius:15px;font-size:16px;line-height:1.4;touch-action:manipulation}
+  .feedback{min-height:34px;font-size:15px;margin-top:10px}
+  .hint{font-size:14px;padding:10px}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+  .actions .btn{width:100%;min-height:48px;padding:10px 8px;font-size:14px}
+  #newRunBtn{grid-column:1/-1}
+  .reward-note{font-size:11px}
+  .shop-grid{grid-template-columns:repeat(2,1fr);gap:7px}
+  .item{padding:10px}.item-icon{font-size:34px;min-height:42px}.item-name{font-size:13px}.item-type,.price{font-size:11px}
+  .item .btn{font-size:12px;min-height:42px}
+  .wardrobe-layout{grid-template-columns:1fr}
+  .wardrobe-preview{padding:12px}
+  .wardrobe-preview .avatar{width:160px;height:168px}
+  .owned-list{grid-template-columns:1fr 1fr;gap:6px}
+  .owned-btn{font-size:12px;padding:8px;min-height:50px}
+  .wrong-item{font-size:13px}
+  .modal-card{padding:18px}.chest{font-size:52px}
+}
+</style>
+
+
+<style id="rpg-v4-overrides">
+.level-progress-wrap{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;margin-top:7px;font-size:11px;color:var(--muted)}
+.level-progress{height:8px;background:#e5dfd5;border-radius:999px;overflow:hidden}.level-progress div{height:100%;background:linear-gradient(90deg,#5b78c7,#8e69b2);transition:.25s}
+.streak-pill{padding:5px 8px;border-radius:999px;background:#fff1d9;color:#825618;font-size:12px;font-weight:900}
+.supply-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}
+.supply-btn{min-height:47px;border:1px solid var(--line);border-radius:13px;background:#fff;padding:7px 8px;font-weight:850;font-size:13px;line-height:1.2}
+.supply-btn b{display:inline-block;min-width:18px}.supply-btn:disabled{opacity:.43}
+.boost-note{grid-column:1/-1;font-size:12px;color:#6b4a1f;background:#fff7e8;border-radius:11px;padding:7px 9px;display:none}
+.shop-section-title{margin:18px 0 8px;font-size:18px}.supply-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.supply-card{padding:12px;text-align:center}.supply-card .item-icon{font-size:38px}.supply-desc{font-size:12px;color:var(--muted);min-height:38px;line-height:1.4;margin:5px 0}.bonus{font-size:11px;color:#2f706e;font-weight:800;min-height:16px;margin-top:4px}
+.level-up-flash{animation:levelpop .55s ease}@keyframes levelpop{0%{transform:scale(.85)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+@media(max-width:640px){
+ .supply-bar{grid-template-columns:repeat(3,1fr);gap:5px}.supply-btn{font-size:11px;padding:7px 4px;min-height:44px}
+ .supply-grid{grid-template-columns:repeat(2,1fr)}.level-progress-wrap{font-size:10px}
+}
+</style>
+
+
+<style id="game-v5-polish">
+:root{
+ --night:#12283d;--sky:#264d66;--cream:#fbf7ee;--gold2:#f3b63b;--battle:#edf4f1;
+}
+body{
+ background:
+   radial-gradient(circle at 50% -80px,rgba(232,184,89,.22),transparent 310px),
+   linear-gradient(180deg,#f7f2e8 0%,#efe8da 100%);
+}
+header .sub{font-size:12px;letter-spacing:.05em}
+.top-grid{margin:10px 0 12px}
+.avatar-panel{background:linear-gradient(145deg,#fffdf8,#f4eee2)}
+.card.game{overflow:hidden;position:relative}
+.card.game:before{
+ content:"";position:absolute;inset:0 0 auto;height:5px;
+ background:linear-gradient(90deg,#2f706e,#d88a2d,#8d6cb1);
+}
+.battle-stage{
+ margin:10px 0 8px;padding:12px 10px;border-radius:20px;
+ display:grid;grid-template-columns:1fr .9fr 1fr;gap:6px;align-items:center;
+ background:
+   radial-gradient(circle at 50% 28%,rgba(255,255,255,.9),rgba(255,255,255,.22) 36%,transparent 38%),
+   linear-gradient(180deg,#dcebe7,#f5efe1);
+ border:1px solid #cddbd7;min-height:150px;position:relative;overflow:hidden;
+}
+.battle-stage:after{
+ content:"";position:absolute;left:0;right:0;bottom:0;height:34%;
+ background:linear-gradient(180deg,rgba(196,210,174,.05),rgba(157,178,131,.28));
+ border-radius:50% 50% 0 0/30% 30% 0 0;pointer-events:none
+}
+.fighter{position:relative;z-index:2;text-align:center;min-width:0}
+.fighter-avatar{height:88px;display:flex;align-items:flex-end;justify-content:center}
+.fighter-avatar .avatar{width:84px;height:90px;margin:0}
+.fighter-avatar .avatar .hat{font-size:29px}
+.fighter-avatar .avatar .acc{font-size:25px;top:41px}
+.fighter-avatar .avatar .chest{font-size:15px;top:49px}
+.fighter-name{font-size:12px;font-weight:950;margin:2px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.enemy-emoji{font-size:68px;line-height:1;height:88px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 6px 4px rgba(34,55,64,.13))}
+.battle-mid{position:relative;z-index:3;text-align:center}
+.battle-word{font-size:17px;font-weight:1000;color:#6a7380;margin-bottom:8px}
+.mission-chip{display:inline-block;font-size:10px;font-weight:900;background:#fff8dc;border:1px solid #ead08c;color:#795915;border-radius:999px;padding:5px 7px}
+.mini-hp{height:7px;border-radius:99px;background:#e4dcd1;overflow:hidden;max-width:92px;margin:auto}
+.mini-hp div{height:100%;width:100%;background:linear-gradient(90deg,#4f9b68,#72bd76);transition:.3s width}
+.enemy-mini-hp div{background:linear-gradient(90deg,#c05252,#e18058)}
+.float-reward{
+ position:absolute;left:50%;top:22px;transform:translateX(-50%);
+ font-weight:1000;color:#9a6511;opacity:0;white-space:nowrap;pointer-events:none;
+ text-shadow:0 2px 0 #fff;
+}
+.float-reward.show{animation:floatUp .9s ease-out}
+@keyframes floatUp{0%{opacity:0;transform:translate(-50%,12px) scale(.8)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-34px) scale(1.12)}}
+.enemy-fighter.hit{animation:enemyHit .34s ease}
+.hero-fighter.hurt{animation:heroHurt .34s ease}
+@keyframes enemyHit{0%{transform:translateX(0)}30%{transform:translateX(9px) rotate(3deg)}60%{transform:translateX(-6px) rotate(-2deg)}100%{transform:translateX(0)}}
+@keyframes heroHurt{0%{transform:translateX(0)}30%{transform:translateX(-9px)}60%{transform:translateX(6px)}100%{transform:translateX(0)}}
+
+.map{gap:6px}
+.node{border-radius:999px;padding:7px 4px;background:#f7f4ed;box-shadow:none}
+.node .ico{font-size:19px}.node b{font-size:10px}.node>div:last-child{font-size:9px}
+.node.active{outline:0;border-color:#d9a343;box-shadow:0 0 0 2px rgba(216,138,45,.22);background:#fff4d7}
+
+.question{
+ background:rgba(255,255,255,.63);border:1px solid rgba(216,208,194,.75);
+ border-radius:16px;padding:13px 14px;margin:9px 0 12px;
+}
+.choice{
+ position:relative;border-width:1.5px;box-shadow:0 2px 0 rgba(64,78,88,.06);
+ transition:transform .1s,background .16s,border-color .16s;
+}
+.choice:not(:disabled):active{transform:translateY(2px);box-shadow:none}
+.choice.correct{box-shadow:0 0 0 2px rgba(47,122,78,.10)}
+.choice.wrong{animation:wrongPulse .22s ease}
+@keyframes wrongPulse{50%{transform:translateX(-4px)}}
+.feedback{border-radius:12px}
+.hint{border-style:solid;background:#fff8e9}
+.actions #newRunBtn{opacity:.58;font-size:12px}
+.reward-note{text-align:center}
+.boss{border-width:2px}
+
+.result{background:linear-gradient(180deg,#fffdf8,#fff5d8)}
+.result .trophy{animation:trophyPop .8s ease}
+@keyframes trophyPop{0%{transform:scale(.4) rotate(-12deg)}70%{transform:scale(1.12) rotate(4deg)}100%{transform:scale(1)}}
+
+@media(max-width:640px){
+ header{padding:0 2px}
+ header h1{font-size:23px}
+ header .sub{display:none}
+ .wallet{background:#17324d;color:#fff;border-color:#17324d}
+ .top-grid{display:grid;grid-template-columns:96px 1fr;gap:7px}
+ .avatar-panel{margin:0;padding:5px 6px;display:block;text-align:center}
+ .avatar-panel .avatar{width:62px;height:66px;margin:auto}
+ .avatar-panel .avatar .hat{font-size:23px}
+ .avatar-panel .avatar .acc{font-size:20px;top:32px}
+ .avatar-panel .avatar .chest{font-size:12px;top:38px}
+ .avatar-info .avatar-name{font-size:11px}
+ .avatar-info .avatar-title{display:none}
+ .stats{grid-template-columns:repeat(2,1fr);gap:5px}
+ .stat{min-height:45px}
+ .stat:nth-child(1),.stat:nth-child(3){display:none}
+ .stat span{font-size:9px}.stat b{font-size:14px}
+ .level-progress-wrap{margin-top:4px}
+ .progress{margin:5px 0 0}
+ .tabs{backdrop-filter:blur(12px)}
+ .map{grid-template-columns:repeat(6,1fr);margin-bottom:6px}
+ .node{padding:5px 1px}.node b,.node>div:last-child{display:none}.node .ico{font-size:18px}
+ .game{padding:10px}
+ .battle-stage{min-height:121px;margin:6px 0 7px;padding:8px}
+ .fighter-avatar{height:68px}.fighter-avatar .avatar{width:65px;height:69px}
+ .fighter-avatar .avatar .hat{font-size:22px}.fighter-avatar .avatar .acc{font-size:19px;top:31px}.fighter-avatar .avatar .chest{font-size:11px;top:37px}
+ .enemy-emoji{font-size:54px;height:68px}
+ .fighter-name{font-size:10px}.battle-word{font-size:13px;margin-bottom:5px}.mission-chip{font-size:9px;padding:4px 5px}
+ .supply-bar{margin:6px 0}.supply-btn{min-height:40px}
+ .question{font-size:20px;padding:11px 12px;margin:7px 0 9px}
+ .choice{min-height:54px;font-size:15.5px;padding:11px 12px}
+ .feedback{font-size:14px}
+ .reward-note{font-size:10px}
+}
+</style>
+
+
+<style id="v6-story-polish">
+.refined-avatar .hat{font-size:42px;top:-6px}
+.refined-avatar .acc{font-size:34px;top:96px;right:-4px}
+.refined-avatar .chest{font-size:21px;top:121px}
+.fighter-avatar .refined-avatar .hat{font-size:26px;top:-5px}
+.fighter-avatar .refined-avatar .acc{font-size:21px;top:42px;right:0}
+.fighter-avatar .refined-avatar .chest{font-size:12px;top:51px}
+.avatar-panel .refined-avatar .hat{font-size:26px}
+.avatar-panel .refined-avatar .acc{font-size:20px;top:41px}
+.avatar-panel .refined-avatar .chest{font-size:12px;top:48px}
+.dialogue-box{display:flex;gap:10px;align-items:flex-start;background:linear-gradient(180deg,#fffdf9,#f8f0de);border:1px solid #e1d1ad;border-radius:18px;padding:12px 12px 10px;margin:10px 0 12px;box-shadow:0 6px 18px rgba(55,44,18,.08)}
+.dialogue-portrait{width:54px;height:54px;border-radius:16px;background:linear-gradient(145deg,#17324d,#355e7c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;flex:0 0 auto;box-shadow:0 4px 12px rgba(23,50,77,.18)}
+.dialogue-body{flex:1;min-width:0}.dialogue-speaker{font-weight:1000;color:#17324d;margin-bottom:4px}
+.dialogue-text{font-size:15px;line-height:1.65;color:#2a3744}.dialogue-actions{margin-top:8px;text-align:right}
+.dialogue-actions .btn{min-height:40px;padding:8px 14px}.dialogue-box.story-end{background:linear-gradient(180deg,#eef8f1,#e8f5eb);border-color:#a8d1b2}
+.result-story{margin-top:14px;font-size:15px;line-height:1.65;color:#324454;background:#fffdfa;border:1px solid #e6dbbf;border-radius:16px;padding:14px}
+@media(max-width:640px){.dialogue-box{padding:10px 10px 9px;border-radius:16px}.dialogue-portrait{width:44px;height:44px;font-size:25px;border-radius:12px}.dialogue-text{font-size:14px}.dialogue-actions .btn{width:100%}}
+</style>
+
+<style id="v7-bank">.bank-info{background:linear-gradient(135deg,#f6fbf7,#e8f4f2);border:1px solid #b9d7ce;color:#1d514c;border-radius:13px;padding:9px 12px;margin:8px 0 12px;font-size:13px;font-weight:700;line-height:1.5}</style></head>
+<body>
+<div class="bank-info" role="status">📚 題庫已擴充：新增 7 份試題概念 × 30 道變化題＝210 題；加上原本 60 題，共 270 題。每次冒險隨機挑選 30 題。</div>
+<!-- 題庫：原有60題＋新增210道同概念變化題；每局30題混合抽題 -->
+
+<div class="wrap">
+<header>
+ <div><h1>🧭 小邦邦數學冒險</h1><div class="sub">協同題型 × 闖關 × 勇者養成</div></div>
+ <div class="wallet">🪙 <span id="coinTop">0</span> 金幣</div>
+</header>
+
+<div class="top-grid">
+ <div class="panel avatar-panel">
+  <div id="avatarTop"></div>
+  <div class="avatar-info"><div class="avatar-name">小邦邦勇者</div><div class="avatar-title" id="heroTitle">數學冒險學徒</div></div>
+ </div>
+ <div>
+  <div class="stats">
+   <div class="panel stat"><span>冒險進度</span><b id="levelText">1 / 30</b></div>
+   <div class="panel stat"><span>勇者等級</span><b id="playerLevel">Lv.1</b></div>
+   <div class="panel stat"><span>成長經驗</span><b id="xpText">0 / 100</b></div>
+   <div class="panel stat"><span>生命</span><b id="heartText">❤️ 5 / 5</b></div>
+  </div>
+  <div class="level-progress-wrap"><span id="levelLeft">Lv.1</span><div class="level-progress"><div id="levelProgressBar"></div></div><span id="levelRight">Lv.2</span></div>
+  <div class="progress"><div id="progressBar"></div></div>
+ </div>
+</div>
+
+<div class="tabs">
+ <button class="tab active" data-screen="adventure">⚔️ 冒險</button>
+ <button class="tab" data-screen="shop">🛒 裝備店</button>
+ <button class="tab" data-screen="wardrobe">👕 衣櫃</button>
+ <button class="tab" data-screen="wrong">📘 錯題本</button>
+</div>
+
+<section id="adventure" class="screen active">
+ <div id="playStatus" style="display:none"></div>
+ <div id="map" class="map"></div>
+ <div id="gameCard" class="card game">
+  <div class="meta"><span id="zoneBadge" class="badge"></span><span id="streakPill" class="streak-pill">🔥 0 連勝</span><span id="source" class="source"></span></div>
+  <div class="battle-stage" id="battleStage">
+    <div class="fighter hero-fighter">
+      <div class="fighter-avatar" id="battleAvatar"></div>
+      <div class="fighter-name">小邦邦</div>
+      <div class="mini-hp"><div id="heroBattleHp"></div></div>
+    </div>
+    <div class="battle-mid">
+      <div class="battle-word" id="battleWord">VS</div>
+      <div class="mission-chip" id="missionChip">🎯 任務：3 連勝</div>
+      <div id="floatReward" class="float-reward"></div>
+    </div>
+    <div class="fighter enemy-fighter" id="enemyFighter">
+      <div class="enemy-emoji" id="enemyEmoji">🌲</div>
+      <div class="fighter-name" id="enemyName">森林守衛</div>
+      <div class="mini-hp enemy-mini-hp"><div id="enemyHp"></div></div>
+    </div>
+  </div>
+  <div id="bossPanel" class="boss"><div class="boss-line"><div class="boss-face">👹</div><div style="flex:1"><b>最終魔王</b><div class="hp"><div id="bossHp"></div></div></div></div></div>
+  <div class="supply-bar">
+   <button id="heartPotionBtn" type="button" class="supply-btn">❤️ 補血藥水 ×<b id="heartPotionCount">0</b></button>
+   <button id="xpPotionBtn" type="button" class="supply-btn">⭐ 經驗藥水 ×<b id="xpPotionCount">0</b></button>
+   <button id="reviveInfoBtn" type="button" class="supply-btn">🪶 復活羽毛 ×<b id="reviveCount">0</b></button>
+   <div id="xpBoostText" class="boost-note"></div>
+  </div>
+
+  <div id="dialogueBox" class="dialogue-box" style="display:none">
+    <div class="dialogue-portrait" id="dialoguePortrait">🧚</div>
+    <div class="dialogue-body">
+      <div class="dialogue-speaker" id="dialogueSpeaker">米歐</div>
+      <div class="dialogue-text" id="dialogueText"></div>
+      <div class="dialogue-actions">
+        <button id="dialogueNext" type="button" class="btn primary">繼續</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="question" class="question"></div>
+  <div id="visual" class="visual"></div>
+  <div id="choices" class="choices"></div>
+  <div id="feedback" class="feedback" aria-live="polite"></div>
+  <div id="hint" class="hint"></div>
+  <div class="actions">
+   <button id="hintBtn" class="btn secondary">💡 提示</button>
+   <button id="nextBtn" class="btn primary" disabled>⚔️ 繼續冒險</button>
+   <button id="newRunBtn" class="btn ghost">⚙️ 重抽冒險</button>
+  </div>
+  <div class="reward-note">✨ 答對攻擊敵人・連勝有獎勵・每區最後一題會掉寶箱</div>
+ </div>
+ <div id="resultCard" class="card result" style="display:none">
+  <div class="trophy">🏆</div><h2 id="resultTitle"></h2><p id="resultText"></p>
+  <div id="resultStory" class="result-story"></div>
+  <button id="againBtn" class="btn primary">開始新的隨機冒險</button>
+ </div>
+</section>
+
+<section id="shop" class="screen">
+ <div class="shop-head"><div><h2 style="margin:0">🛒 勇者商店</h2><div class="sub">裝備有能力加成；補給道具可以在冒險中使用。</div></div><div class="wallet">🪙 <span id="coinShop">0</span></div></div>
+ <h3 class="shop-section-title">⚔️ 永久裝備</h3><div id="shopGrid" class="shop-grid"></div>
+ <h3 class="shop-section-title">🧪 冒險補給</h3><div id="supplyGrid" class="supply-grid"></div>
+</section>
+
+<section id="wardrobe" class="screen">
+ <div class="wardrobe-head"><div><h2 style="margin:0">👕 小邦邦衣櫃</h2><div class="sub">點選已擁有的裝備，就會立刻穿上。</div></div></div>
+ <div class="wardrobe-layout">
+  <div class="panel wardrobe-preview"><div id="avatarBig"></div><div class="avatar-name">小邦邦勇者</div><div class="avatar-title" id="wardrobeTitle"></div></div>
+  <div class="panel" style="padding:14px"><div id="ownedList" class="owned-list"></div></div>
+ </div>
+</section>
+
+<section id="wrong" class="screen">
+ <h2>📘 錯題本</h2>
+ <div class="sub" style="margin-bottom:12px">只記錄印刷題目／題庫內容，不會包含照片上的手寫筆記。</div>
+ <div id="wrongList" class="wrong-list"></div>
+</section>
+</div>
+
+<div id="rewardModal" class="modal">
+ <div class="modal-card">
+  <div class="chest">🎁</div><h2 id="rewardTitle">區域寶箱！</h2><div id="rewardCoins" class="coin-big"></div><p id="rewardDesc"></p>
+  <button id="rewardOk" class="btn primary">收下獎勵</button>
+ </div>
+</div>
+
+<script>
+const QUESTIONS = [{"id":"O01","zone":"forest","q":"18 + 6 × 5 − 24 ÷ 6 = ?","choices":["40","42","44","46"],"answer":"44","hint":"先算乘除，再算加減。","source":"原題型","visual":null},{"id":"O02","zone":"forest","q":"(48 ÷ 6) × 3 − 5 = ?","choices":["14","19","21","24"],"answer":"19","hint":"先算括號，再乘法，最後減法。","source":"原題型","visual":null},{"id":"O03","zone":"forest","q":"27 × 14 − 27 × 4 = ?","choices":["270","280","300","378"],"answer":"270","hint":"把共同的 27 提出來：27×(14−4)。","source":"原題型","visual":null},{"id":"O04","zone":"forest","q":"9 − 9 ÷ 3 + 5 × 4 − 6 = ?","choices":["14","18","20","26"],"answer":"20","hint":"先算 9÷3 與 5×4。","source":"原題型","visual":null},{"id":"O05","zone":"forest","q":"3.6 + 0.8 × □ = 6，□ 是多少？","choices":["2","2.5","3","4"],"answer":"3","hint":"先算 6−3.6，再除以 0.8。","source":"原題型","visual":null},{"id":"O06","zone":"geometry","q":"哪一組長度可以形成三角形？","choices":["3、4、8","6、7、10","2、5、7","4、4、9"],"answer":"6、7、10","hint":"任兩邊相加必須大於第三邊。","source":"原題型","visual":null},{"id":"O07","zone":"geometry","q":"等腰三角形三角為 70°、55°、55°，頂角是？","choices":["55°","70°","110°","無法判斷"],"answer":"70°","hint":"等腰三角形兩個底角相等。","source":"原題型","visual":null},{"id":"O08","zone":"geometry","q":"三角形縮成原來的 1/2，內角會如何？","choices":["變一半","變兩倍","不變","無法判斷"],"answer":"不變","hint":"相似圖形的對應角相等。","source":"原題型","visual":null},{"id":"O09","zone":"geometry","q":"某角柱共有 12 個頂點，它有幾個面、幾條邊？","choices":["6面12邊","8面18邊","10面18邊","12面24邊"],"answer":"8面18邊","hint":"這是六角柱：頂點 2n、邊 3n、面 n+2。","source":"原題型","visual":null},{"id":"O10","zone":"geometry","q":"正方形邊長變成 1.5 倍，面積變成幾倍？","choices":["1.5","2","2.25","3"],"answer":"2.25","hint":"面積倍率要把長度倍率平方。","source":"原題型","visual":null},{"id":"O11","zone":"ratio","q":"0.035 = ?","choices":["0.35%","3.5%","35%","350%"],"answer":"3.5%","hint":"小數變百分率要乘 100。","source":"原題型","visual":null},{"id":"O12","zone":"ratio","q":"12.5% 等於？","choices":["1/4","1/5","1/8","1/10"],"answer":"1/8","hint":"12.5%=0.125。","source":"原題型","visual":null},{"id":"O13","zone":"ratio","q":"75 公克等於多少公斤？","choices":["0.0075","0.075","0.75","7.5"],"answer":"0.075","hint":"1000 公克 = 1 公斤。","source":"原題型","visual":null},{"id":"O14","zone":"ratio","q":"比例尺 1：50,000，地圖上 6 公分，實際距離是多少？","choices":["300 公尺","3 公里","30 公里","300 公里"],"answer":"3 公里","hint":"6×50,000=300,000 公分，再換成公里。","source":"原題型","visual":null},{"id":"O15","zone":"ratio","q":"比例尺 1：200，圖上面積 18 平方公分，實際面積？","choices":["7.2㎡","18㎡","36㎡","72㎡"],"answer":"72㎡","hint":"面積倍率是 200²，再換算平方公分與平方公尺。","source":"原題型","visual":null},{"id":"O16","zone":"multiples","q":"下列哪一組互質？","choices":["24、36","35、64","49、77","51、69"],"answer":"35、64","hint":"互質代表最大公因數只有 1。","source":"原題型","visual":null},{"id":"O17","zone":"multiples","q":"53□ 同時是 2 與 3 的倍數，□ 應填？","choices":["0","2","4","6"],"answer":"4","hint":"先找偶數，再檢查各位數字和是否為 3 的倍數。","source":"原題型","visual":null},{"id":"O18","zone":"multiples","q":"1 到 200 中，8 和 12 的公倍數共有幾個？","choices":["6","7","8","9"],"answer":"8","hint":"8 與 12 的最小公倍數是 24。","source":"原題型","visual":null},{"id":"O19","zone":"multiples","q":"哪一句是錯的？","choices":["個位0一定是5倍數","偶數一定是2倍數","各位和是3倍數則原數也是","個位5一定是10倍數"],"answer":"個位5一定是10倍數","hint":"10 的倍數個位一定要是 0。","source":"原題型","visual":null},{"id":"O20","zone":"multiples","q":"2310 有幾個不同的質因數？","choices":["3","4","5","6"],"answer":"5","hint":"2310=2×3×5×7×11。","source":"原題型","visual":null},{"id":"O21","zone":"speed","q":"每 18 分鐘一班，第一班 2:06，第七班幾點？","choices":["3:36","3:42","3:48","3:54"],"answer":"3:54","hint":"第 1 班到第 7 班共有 6 個間隔。","source":"原題型","visual":null},{"id":"O22","zone":"speed","q":"5 題花 4分10秒，同速度做 25 題要多久？","choices":["16分50秒","20分50秒","21分10秒","25分"],"answer":"20分50秒","hint":"25 題是 5 題的 5 倍。","source":"原題型","visual":null},{"id":"O23","zone":"speed","q":"8 公尺花 12分24秒，平均 1 公尺要多久？","choices":["1分23秒","1分30秒","1分33秒","1分36秒"],"answer":"1分33秒","hint":"12分24秒=744秒，再除以8。","source":"原題型","visual":null},{"id":"O24","zone":"speed","q":"同一路程，去程 80m/分，回程 120m/分，全程平均速率？","choices":["90","96","100","110"],"answer":"96","hint":"假設單程 240m，分別算時間後再以總距離÷總時間。","source":"原題型","visual":null},{"id":"O25","zone":"speed","q":"距山壁255m，1.5秒聽見回聲，聲速約多少？","choices":["170","255","340","510"],"answer":"340","hint":"聲音走了來回，共 510m。","source":"原題型","visual":null},{"id":"O26","zone":"boss","q":"打八折後 560 元，原價是多少？","choices":["600","650","700","720"],"answer":"700","hint":"原價×0.8=560。","source":"原題型","visual":null},{"id":"O27","zone":"boss","q":"哪個最便宜？","choices":["2.5L 45元","1.8L 30元","4L 72元","1.2L 22元"],"answer":"1.8L 30元","hint":"全部換成每 1 公升多少元來比較。","source":"原題型","visual":null},{"id":"O28","zone":"boss","q":"74 顆糖，每盒裝相同數量，最後剩14顆。每盒最少可能裝幾顆？","choices":["15","20","30","60"],"answer":"20","hint":"74−14=60；盒容量要是 60 的因數，而且要大於14。","source":"原題型","visual":null},{"id":"O29","zone":"boss","q":"○、△、□、★、◇ 循環，第248個是？","choices":["○","△","□","★"],"answer":"□","hint":"248÷5 看餘數。","source":"原題型","visual":null},{"id":"O30","zone":"boss","q":"每隔12公尺一棵樹，從第5棵走到第20棵花2分15秒，平均時速？","choices":["3.6公里","4.0公里","4.8公里","5.4公里"],"answer":"4.8公里","hint":"第5到第20棵有15個間隔，共180m；2分15秒=135秒。","source":"原題型","visual":null},{"id":"N01","zone":"forest","q":"3.14 × 1.8 + 0.2 × 3.14 − 3.14 × 0.5 + 3.5 × 3.14 = ?","choices":["15.7","12.56","9.42","6.28","3.14"],"answer":"15.7","hint":"把 3.14 當共同因數提出來，括號內算 1.8+0.2−0.5+3.5。","source":"衝刺班題型","visual":null},{"id":"N02","zone":"forest","q":"1/8 和 2/11 之間有多少個真分數？","choices":["4","5","6","7","無限多"],"answer":"無限多","hint":"任意兩個不同的有理數之間，都還能找到無限多個有理數。","source":"衝刺班題型","visual":null},{"id":"N03","zone":"boss","q":"甲、乙、丙三間超商同時對同一品牌的飲料做特價促銷。甲超商買一瓶送原容量 1/5 的小瓶飲料；乙超商為買五瓶送一瓶；丙超商為原價打八五折。哪一家的飲料較便宜？","choices":["甲","乙","丙","甲、乙一樣便宜","甲、乙、丙一樣便宜"],"answer":"甲、乙一樣便宜","hint":"把三家的「每 1 瓶原容量」實付價格換成同一基準比較。","source":"衝刺班題型","visual":null},{"id":"N04","zone":"speed","q":"嘉義客運隔著一定時間開出往民雄的公車，第一班是上午 6 時 20 分，而上午 7 時、上午 8 時也各有一班車，問班車的間距最長是幾分鐘？","choices":["20","30","40","50","60"],"answer":"20","hint":"班距必須同時整除 6:20→7:00 的 40 分鐘與 7:00→8:00 的 60 分鐘。","source":"衝刺班題型","visual":null},{"id":"N05","zone":"forest","q":"某數是三位數，去掉末兩位的兩個「0」，所得的新數與原數差 396，問原數與新數的積是多少？","choices":["39600","9900","1600","400","3600"],"answer":"1600","hint":"原數可寫成 100a，去掉兩個 0 後變成 a。","source":"衝刺班題型","visual":null},{"id":"N06","zone":"speed","q":"有一閃光裝置，當時鐘一點時閃 1 下，二點時閃 2 下……依此類推。已知三點時閃 3 下共花 6 秒鐘。請問閃 6 下的時候，需花多少秒？","choices":["12","15","8","6","18"],"answer":"15","hint":"3 下閃光之間只有 2 個時間間隔；6 下則有 5 個間隔。","source":"衝刺班題型","visual":null},{"id":"N07","zone":"geometry","q":"下列四個展開圖中，有幾個能構成一正方體？","choices":["0","2","4","1","3"],"answer":"3","hint":"把相鄰方格想像沿邊折起來；若兩個面最後重疊就不是正方體展開圖。","source":"衝刺班題型","visual":"cubeNets"},{"id":"N08","zone":"ratio","q":"右圖三角形的面積是 480 平方公分，底邊的比是 9：7，問面積相差多少平方公分？","choices":["30","60","90","120","150"],"answer":"60","hint":"兩個三角形共用同一個高，所以面積比等於底邊比 9：7。","source":"衝刺班題型","visual":"triangleRatio"},{"id":"N09","zone":"speed","q":"大水管每分鐘注水 5 又 7/9 公升，小水管每分鐘排水 3 又 2/3 公升，兩管同時開放，18 分鐘後共有多少公升的水？","choices":["19","38","170","184","36"],"answer":"38","hint":"先求每分鐘淨增加水量，再乘 18 分鐘。","source":"衝刺班題型","visual":null},{"id":"N10","zone":"ratio","q":"小雁和小德分一箱蘋果，小雁分得 4/7，剩下的全都給小德，結果小德得到 21 顆，則小雁分得的數量比小德多幾顆？","choices":["7","14","6","12","21"],"answer":"7","hint":"小德拿到剩下的 3/7，已知 3/7 是 21 顆。","source":"衝刺班題型","visual":null},{"id":"N11","zone":"boss","q":"利用火柴棒排列如圖，請問 60 根火柴可排成完整的平行四邊形有幾個？","choices":["15","20","19","21","16"],"answer":"19","hint":"第一個平行四邊形用 4 根，之後每增加一個只多 3 根。","source":"衝刺班題型","visual":"matchsticks"},{"id":"N12","zone":"boss","q":"在 2 與 20 間放入五個數，使相鄰兩數的差都固定，問這五數的總和是多少？","choices":["22","110","66","77","55"],"answer":"55","hint":"連同 2 和 20 一共有 7 個等差數，相鄰共有 6 段。","source":"衝刺班題型","visual":null},{"id":"N13","zone":"multiples","q":"蘋果每 3、5、7 個一數，都剩下 2 個，若蘋果數不超過 500 個，則蘋果的數量最多有幾個？","choices":["418","420","422","428","432"],"answer":"422","hint":"同時除以 3、5、7 都餘 2，所以減 2 後是 105 的倍數。","source":"衝刺班題型","visual":null},{"id":"N14","zone":"ratio","q":"甲的體重是 34kg，恰好是母親的 2/3，母親的體重又是父親的 3/4，則父親的體重是？","choices":["70","65","75","72","68"],"answer":"68","hint":"先由 34÷(2/3) 求母親，再由母親÷(3/4) 求父親。","source":"衝刺班題型","visual":null},{"id":"N15","zone":"geometry","q":"右圖中斜線面積是多少？（單位：cm²）","choices":["2784","2384","2458","2584","2874"],"answer":"2584","hint":"先算外框面積，再扣掉寬 2 的十字白色區域；十字交叉處只能扣一次。","source":"衝刺班題型","visual":"shadedArea"},{"id":"N16","zone":"ratio","q":"清境牧場中，牛和羊的比是 5：8，已知牛有 40 隻，豬比牛多 16 隻，豬和羊的隻數比是多少？","choices":["7：8","5：8","8：5","8：7","1：3"],"answer":"7：8","hint":"先由 5：8 和牛 40 隻求羊，再算豬 40+16。","source":"衝刺班題型","visual":null},{"id":"N17","zone":"geometry","q":"正方形的對稱軸有 a 條，長方形有 b 條，平行四邊形有 c 條，菱形有 d 條，則 a+b+c+d = ?","choices":["8","10","12","14","16"],"answer":"8","hint":"正方形 4 條、長方形 2 條、一般平行四邊形 0 條、菱形 2 條。","source":"衝刺班題型","visual":null},{"id":"N18","zone":"boss","q":"甲、乙、丙三人在談論數學成績，甲說：「我與乙的成績和比乙與丙的成績和還小。」乙說：「我與甲的成績和比甲與丙的成績和還大。」依甲、乙兩人的說法推算，甲、乙、丙三人哪一個成績最高？","choices":["甲","乙","丙","一樣高","無法判斷"],"answer":"無法判斷","hint":"甲的話可化成甲＜丙；乙的話可化成乙＞甲，但乙與丙誰大仍不知道。","source":"衝刺班題型","visual":null},{"id":"N19","zone":"ratio","q":"男女生 38 人的平均體重是 29kg，男生 20 人的平均體重是 29.9kg，則女生的平均體重是？","choices":["27.5","28","28.5","29","29.5"],"answer":"28","hint":"先用 38×29 求總重量，再扣掉男生 20×29.9，最後除以女生人數。","source":"衝刺班題型","visual":null},{"id":"N20","zone":"boss","q":"同時擲出 2 個公正骰子，可能會出現點數和有多少種？","choices":["12","8","10","9","11"],"answer":"11","hint":"兩顆骰子的點數和最小 2、最大 12，之間每個整數都可能出現。","source":"衝刺班題型","visual":null},{"id":"N21","zone":"multiples","q":"假如七個連續整數和是 231，則請問最小數是多少？","choices":["29","30","31","32","33"],"answer":"30","hint":"七個連續整數的中間數就是平均數 231÷7。","source":"衝刺班題型","visual":null},{"id":"N22","zone":"geometry","q":"正十六邊形共可畫出多少條對角線？","choices":["240","103","105","104","208"],"answer":"104","hint":"n 邊形對角線數公式是 n(n−3)÷2。","source":"衝刺班題型","visual":null},{"id":"N23","zone":"multiples","q":"已知民國 101 年是龍年，則依 12 生肖鼠、牛、虎、兔、龍、蛇、馬、羊、猴、雞、狗、豬的順序批算，民國 140 年是什麼年？","choices":["猴","羊","馬","雞","狗"],"answer":"羊","hint":"生肖每 12 年循環一次；算 140−101 後看餘數。","source":"衝刺班題型","visual":null},{"id":"N24","zone":"multiples","q":"三個整數 a、b、c，a×b=306；b×c=255，其中 b 最大是？","choices":["9","17","1530","51","102"],"answer":"51","hint":"b 同時是 306 與 255 的因數，要最大就找最大公因數。","source":"衝刺班題型","visual":null},{"id":"N25","zone":"boss","q":"小明的數學成績總是不太好，於是小明訂了一個計畫，決定每次考試平均分數都要進步 1 分，若小明第一次考 78 分，問第五次應該考幾分？","choices":["84","86","90","92","82"],"answer":"86","hint":"第 n 次考完的平均要比前一次平均多 1 分；用「前5次總分−前4次總分」找第五次。","source":"衝刺班題型","visual":null},{"id":"N26","zone":"ratio","q":"5 元、10 元、50 元、100 元的硬幣合計有 2340 元，其個數比為 30：8：5：3，那麼 10 元的硬幣有幾個？","choices":["14","15","21","22","24"],"answer":"24","hint":"先把 30：8：5：3 各當作一組，算一組硬幣的總金額，再看 2340 是幾組。","source":"衝刺班題型","visual":null},{"id":"N27","zone":"forest","q":"1又11/34 × (□ − 4/9) = 1又3/17，□ = ?","choices":["1又1/17","2又1/9","1又1/2","1又1/3","1又1/4"],"answer":"1又1/3","hint":"先把帶分數化成假分數，再把括號視為未知數。","source":"衝刺班題型","visual":null},{"id":"N28","zone":"ratio","q":"圓形百分率圖，其中 60% 表示人數為 168 人，那麼 70 人要用圓心角多少度的扇形來表示？","choices":["30","60","90","100","120"],"answer":"90","hint":"168 人是 60%，先求總人數；再求 70 人占幾%，乘 360°。","source":"衝刺班題型","visual":null},{"id":"N29","zone":"geometry","q":"右圖為一組三角板所組成的圖形，其中 AB = AC，求角 X 為多少度？","choices":["125","110","135","105","115"],"answer":"105","hint":"30-60-90 三角板先給出 ∠BCA=30°；AB=AC 讓 △ABC 的兩底角相等，再利用 45-45-90 三角板。","source":"衝刺班題型","visual":"setSquares"},{"id":"N30","zone":"boss","q":"希臘數學家丟番圖的墓碑上記載著：他生命的六分之一是幸福的童年，再活了他壽命的十二分之一，兩頰長起了細細的鬍鬚；他結了婚，又度過了一生的七分之一，再過五年，他有了孩子；兒子只活了他全部年齡的一半，兒子死後，他在極度悲傷中又過了四年，也與世長辭。試問：他去世時的年齡為多少歲？","choices":["84","42","63","76","105"],"answer":"84","hint":"設壽命為 x：x/6+x/12+x/7+5+x/2+4=x。","source":"衝刺班題型","visual":null},{"id":"T01_01","zone":"forest","q":"29 + 9 × 5 − 5 = ?","choices":["38","69","78","79"],"answer":"69","hint":"先乘法，後加減。","source":"新增試題四｜同概念變化題","paper":1,"concept":"四則運算","visual":null},{"id":"T01_02","zone":"forest","q":"25 × 19 − 25 × 7 = ?","choices":["450","325","300","650"],"answer":"300","hint":"利用分配律：共同因數乘以兩數之差。","source":"新增試題四｜同概念變化題","paper":1,"concept":"分配律","visual":null},{"id":"T01_03","zone":"forest","q":"0.39 + 0.7 = ?","choices":["1.09","2.09","1.19","1.08"],"answer":"1.09","hint":"小數點對齊後相加。","source":"新增試題四｜同概念變化題","paper":1,"concept":"小數計算","visual":null},{"id":"T01_04","zone":"forest","q":"22 + 6 × □ = 64，□ 是多少？","choices":["8","7","6","9"],"answer":"7","hint":"先移項，再除以乘數。","source":"新增試題四｜同概念變化題","paper":1,"concept":"未知數","visual":null},{"id":"T01_05","zone":"forest","q":"4/12 + 2/12 = ?（約成最簡分數）","choices":["8/12","1/2","6/12","7/12"],"answer":"1/2","hint":"同分母先加分子，再約分。","source":"新增試題四｜同概念變化題","paper":1,"concept":"分數加法","visual":null},{"id":"T01_06","zone":"geometry","q":"兩根木條長 12、11 公分，第三根長度哪一個「不能」組成三角形？","choices":["23","20","22","2"],"answer":"23","hint":"三角形任兩邊和必須嚴格大於第三邊。","source":"新增試題四｜同概念變化題","paper":1,"concept":"三角形不等式","visual":null},{"id":"T01_07","zone":"geometry","q":"正 12 邊形共有幾條對角線？","choices":["42","60","54","66"],"answer":"54","hint":"每個頂點連 n−3 條，除以 2 避免重複。","source":"新增試題四｜同概念變化題","paper":1,"concept":"多邊形對角線","visual":null},{"id":"T01_08","zone":"geometry","q":"等腰三角形兩個底角都是 70°，頂角是多少度？","choices":["70°","50°","110°","40°"],"answer":"40°","hint":"三角形內角和 180°，扣掉兩個底角。","source":"新增試題四｜同概念變化題","paper":1,"concept":"三角形內角","visual":null},{"id":"T01_09","zone":"geometry","q":"一個正方形邊長 12 公分，放大成 4 倍後，面積是原來的幾倍？","choices":["16","20","4","8"],"answer":"16","hint":"面積倍率＝長度倍率的平方。","source":"新增試題四｜同概念變化題","paper":1,"concept":"面積倍率","visual":null},{"id":"T01_10","zone":"geometry","q":"一個 8 角柱有幾個面、幾條邊？","choices":["10面、16邊","9面、24邊","8面、16邊","10面、24邊"],"answer":"10面、24邊","hint":"n 角柱有 n+2 個面與 3n 條邊。","source":"新增試題四｜同概念變化題","paper":1,"concept":"角柱","visual":null},{"id":"T01_11","zone":"ratio","q":"一件裝備打 8 折後賣 560 元，原價多少元？","choices":["800","600","560","700"],"answer":"700","hint":"打折後價格÷折數對應的小數。","source":"新增試題四｜同概念變化題","paper":1,"concept":"百分率","visual":null},{"id":"T01_12","zone":"ratio","q":"195 顆寶石依 6：7 分成兩堆，較多的一堆有幾顆？","choices":["97","120","105","90"],"answer":"105","hint":"先求每一份，再乘較大的比例份數。","source":"新增試題四｜同概念變化題","paper":1,"concept":"比例分配","visual":null},{"id":"T01_13","zone":"ratio","q":"男生 13 人平均 29 公斤，女生 9 人平均 37 公斤，全班體重總和多少公斤？","choices":["673","710","638","739"],"answer":"710","hint":"人數乘平均值，再把兩組總和相加。","source":"新增試題四｜同概念變化題","paper":1,"concept":"加權平均","visual":null},{"id":"T01_14","zone":"ratio","q":"一箱餅乾先送出 2/5，剩下 27 片，原來有幾片？","choices":["54","27","36","45"],"answer":"45","hint":"剩下的分率是 (分母−分子)/分母。","source":"新增試題四｜同概念變化題","paper":1,"concept":"分數應用","visual":null},{"id":"T01_15","zone":"ratio","q":"地圖比例尺 1：10,000，圖上 3 公分，實際距離幾公尺？","choices":["300","400","3000","30"],"answer":"300","hint":"圖上公分數乘比例尺分母，再除以 100 變成公尺。","source":"新增試題四｜同概念變化題","paper":1,"concept":"比例尺","visual":null},{"id":"T01_16","zone":"multiples","q":"32 與 16 的最大公因數是多少？","choices":["17","32","8","16"],"answer":"16","hint":"質因數分解或短除法。","source":"新增試題四｜同概念變化題","paper":1,"concept":"最大公因數","visual":null},{"id":"T01_17","zone":"multiples","q":"10 和 15 的最小公倍數是多少？","choices":["40","30","15","150"],"answer":"30","hint":"先求最大公因數，再用兩數相乘除以最大公因數。","source":"新增試題四｜同概念變化題","paper":1,"concept":"最小公倍數","visual":null},{"id":"T01_18","zone":"multiples","q":"三位數 36□ 同時是 2 和 3 的倍數，□ 可以填哪個數字？","choices":["6","3","5","1"],"answer":"6","hint":"個位要是偶數，且各位數字和能被 3 整除。","source":"新增試題四｜同概念變化題","paper":1,"concept":"整除判別","visual":null},{"id":"T01_19","zone":"multiples","q":"🔴、🟡、🟢、🔵、🟣 不斷循環，第 219 個是哪個？","choices":["🔴","🟡","🟢","🔵"],"answer":"🔵","hint":"以 5 為一輪，注意餘數 0 對應第 5 個。","source":"新增試題四｜同概念變化題","paper":1,"concept":"週期規律","visual":null},{"id":"T01_20","zone":"multiples","q":"寶石每 6 個或每 8 個分組都剩 5 個，不超過 154 顆時最多有幾顆？","choices":["144","149","173","125"],"answer":"149","hint":"扣掉餘數後，必須是兩數最小公倍數的倍數。","source":"新增試題四｜同概念變化題","paper":1,"concept":"同餘與公倍數","visual":null},{"id":"T01_21","zone":"speed","q":"巴士每 15 分鐘一班，首班 7:20，第 10 班是幾點？","choices":["9:35","9:20","9:50","10:05"],"answer":"9:35","hint":"第 n 班和第一班之間有 n−1 個間隔。","source":"新增試題四｜同概念變化題","paper":1,"concept":"班次間隔","visual":null},{"id":"T01_22","zone":"speed","q":"同一段路，去程每分鐘 60 公尺，回程每分鐘 90 公尺，往返平均速率每分鐘多少公尺？","choices":["75","72","90","60"],"answer":"72","hint":"同距離來回平均速率＝2ab/(a+b)。","source":"新增試題四｜同概念變化題","paper":1,"concept":"往返平均速率","visual":null},{"id":"T01_23","zone":"speed","q":"3 位同學 8 分鐘打掃 3 間教室；同樣人數、同樣速度，打掃 21 間需幾分鐘？","choices":["48","168","64","56"],"answer":"56","hint":"工作效率不變，教室數是幾倍，時間就幾倍。","source":"新增試題四｜同概念變化題","paper":1,"concept":"工作效率","visual":null},{"id":"T01_24","zone":"speed","q":"兩列火車長 50 與 110 公尺，迎面而行，第一列秒速 4 公尺，從相遇到完全錯開共 10 秒，第二列秒速多少公尺？","choices":["11","14","13","12"],"answer":"12","hint":"兩列車的長度和÷時間＝相對速度，再扣掉第一列速度。","source":"新增試題四｜同概念變化題","paper":1,"concept":"相向火車","visual":null},{"id":"T01_25","zone":"speed","q":"燈塔閃 4 下共花 18 秒，每次間隔相同，閃 7 下花幾秒？","choices":["37","30","42","36"],"answer":"36","hint":"閃 n 下只有 n−1 個間隔。","source":"新增試題四｜同概念變化題","paper":1,"concept":"時間間隔","visual":null},{"id":"T01_26","zone":"boss","q":"爸爸比孩子大 34 歲，8 年後爸爸年齡是孩子的 3 倍，爸爸今年幾歲？","choices":["51","43","46","9"],"answer":"43","hint":"設孩子今年 x 歲，年齡差固定。","source":"新增試題四｜同概念變化題","paper":1,"concept":"年齡倍數","visual":null},{"id":"T01_27","zone":"boss","q":"正方形廣場邊長 60 公尺，每隔 5 公尺沿封閉周界種一棵樹（四角都有），共種幾棵？","choices":["48","49","52","44"],"answer":"48","hint":"封閉路線棵數＝總周長÷間距，不要再加 1。","source":"新增試題四｜同概念變化題","paper":1,"concept":"封閉植樹","visual":null},{"id":"T01_28","zone":"boss","q":"魔法商店全館打 7 折，付了 84 金幣，原價多少金幣？","choices":["110","120","130","84"],"answer":"120","hint":"用實付價格除以折扣率。","source":"新增試題四｜同概念變化題","paper":1,"concept":"逆向百分率","visual":null},{"id":"T01_29","zone":"boss","q":"一列數字為 2、5、8……共 7 個，總和是多少？","choices":["77","80","84","74"],"answer":"77","hint":"等差數列總和＝（首項＋末項）×項數÷2。","source":"新增試題四｜同概念變化題","paper":1,"concept":"等差數列","visual":null},{"id":"T01_30","zone":"boss","q":"9 個連續整數總和為 270，最小的整數是多少？","choices":["30","27","25","26"],"answer":"26","hint":"奇數個連續整數的平均數就是中間那個數。","source":"新增試題四｜同概念變化題","paper":1,"concept":"連續整數","visual":null},{"id":"T02_01","zone":"forest","q":"12 + 9 × 8 − 6 = ?","choices":["78","90","23","87"],"answer":"78","hint":"先乘法，後加減。","source":"新增試題五｜同概念變化題","paper":2,"concept":"四則運算","visual":null},{"id":"T02_02","zone":"forest","q":"32 × 13 − 32 × 3 = ?","choices":["384","352","512","320"],"answer":"320","hint":"利用分配律：共同因數乘以兩數之差。","source":"新增試題五｜同概念變化題","paper":2,"concept":"分配律","visual":null},{"id":"T02_03","zone":"forest","q":"0.24 + 0.2 = ?","choices":["0.43","1.44","0.54","0.44"],"answer":"0.44","hint":"小數點對齊後相加。","source":"新增試題五｜同概念變化題","paper":2,"concept":"小數計算","visual":null},{"id":"T02_04","zone":"forest","q":"30 + 3 × □ = 75，□ 是多少？","choices":["16","17","15","14"],"answer":"15","hint":"先移項，再除以乘數。","source":"新增試題五｜同概念變化題","paper":2,"concept":"未知數","visual":null},{"id":"T02_05","zone":"forest","q":"3/8 + 4/8 = ?（約成最簡分數）","choices":["7/8","12/8","其他答案1","8/8"],"answer":"7/8","hint":"同分母先加分子，再約分。","source":"新增試題五｜同概念變化題","paper":2,"concept":"分數加法","visual":null},{"id":"T02_06","zone":"geometry","q":"兩根木條長 5、12 公分，第三根長度哪一個「不能」組成三角形？","choices":["18","17","8","16"],"answer":"17","hint":"三角形任兩邊和必須嚴格大於第三邊。","source":"新增試題五｜同概念變化題","paper":2,"concept":"三角形不等式","visual":null},{"id":"T02_07","zone":"geometry","q":"正 10 邊形共有幾條對角線？","choices":["35","40","25","45"],"answer":"35","hint":"每個頂點連 n−3 條，除以 2 避免重複。","source":"新增試題五｜同概念變化題","paper":2,"concept":"多邊形對角線","visual":null},{"id":"T02_08","zone":"geometry","q":"等腰三角形兩個底角都是 50°，頂角是多少度？","choices":["80°","90°","130°","50°"],"answer":"80°","hint":"三角形內角和 180°，扣掉兩個底角。","source":"新增試題五｜同概念變化題","paper":2,"concept":"三角形內角","visual":null},{"id":"T02_09","zone":"geometry","q":"一個正方形邊長 6 公分，放大成 4 倍後，面積是原來的幾倍？","choices":["20","8","16","4"],"answer":"16","hint":"面積倍率＝長度倍率的平方。","source":"新增試題五｜同概念變化題","paper":2,"concept":"面積倍率","visual":null},{"id":"T02_10","zone":"geometry","q":"一個 7 角柱有幾個面、幾條邊？","choices":["7面、14邊","8面、21邊","9面、14邊","9面、21邊"],"answer":"9面、21邊","hint":"n 角柱有 n+2 個面與 3n 條邊。","source":"新增試題五｜同概念變化題","paper":2,"concept":"角柱","visual":null},{"id":"T02_11","zone":"ratio","q":"一件裝備打 8 折後賣 640 元，原價多少元？","choices":["800","900","640","700"],"answer":"800","hint":"打折後價格÷折數對應的小數。","source":"新增試題五｜同概念變化題","paper":2,"concept":"百分率","visual":null},{"id":"T02_12","zone":"ratio","q":"126 顆寶石依 6：3 分成兩堆，較多的一堆有幾顆？","choices":["63","98","42","84"],"answer":"84","hint":"先求每一份，再乘較大的比例份數。","source":"新增試題五｜同概念變化題","paper":2,"concept":"比例分配","visual":null},{"id":"T02_13","zone":"ratio","q":"男生 14 人平均 30 公斤，女生 10 人平均 32 公斤，全班體重總和多少公斤？","choices":["770","720","740","708"],"answer":"740","hint":"人數乘平均值，再把兩組總和相加。","source":"新增試題五｜同概念變化題","paper":2,"concept":"加權平均","visual":null},{"id":"T02_14","zone":"ratio","q":"一箱餅乾先送出 4/7，剩下 12 片，原來有幾片？","choices":["12","28","32","24"],"answer":"28","hint":"剩下的分率是 (分母−分子)/分母。","source":"新增試題五｜同概念變化題","paper":2,"concept":"分數應用","visual":null},{"id":"T02_15","zone":"ratio","q":"地圖比例尺 1：10,000，圖上 6 公分，實際距離幾公尺？","choices":["700","6000","60","600"],"answer":"600","hint":"圖上公分數乘比例尺分母，再除以 100 變成公尺。","source":"新增試題五｜同概念變化題","paper":2,"concept":"比例尺","visual":null},{"id":"T02_16","zone":"multiples","q":"45 與 120 的最大公因數是多少？","choices":["16","30","7","15"],"answer":"15","hint":"質因數分解或短除法。","source":"新增試題五｜同概念變化題","paper":2,"concept":"最大公因數","visual":null},{"id":"T02_17","zone":"multiples","q":"12 和 18 的最小公倍數是多少？","choices":["48","216","18","36"],"answer":"36","hint":"先求最大公因數，再用兩數相乘除以最大公因數。","source":"新增試題五｜同概念變化題","paper":2,"concept":"最小公倍數","visual":null},{"id":"T02_18","zone":"multiples","q":"三位數 89□ 同時是 2 和 3 的倍數，□ 可以填哪個數字？","choices":["3","5","1","4"],"answer":"4","hint":"個位要是偶數，且各位數字和能被 3 整除。","source":"新增試題五｜同概念變化題","paper":2,"concept":"整除判別","visual":null},{"id":"T02_19","zone":"multiples","q":"🔴、🟡、🟢、🔵、🟣 不斷循環，第 173 個是哪個？","choices":["🔴","🔵","🟡","🟢"],"answer":"🟢","hint":"以 5 為一輪，注意餘數 0 對應第 5 個。","source":"新增試題五｜同概念變化題","paper":2,"concept":"週期規律","visual":null},{"id":"T02_20","zone":"multiples","q":"寶石每 4 個或每 7 個分組都剩 3 個，不超過 161 顆時最多有幾顆？","choices":["143","171","140","115"],"answer":"143","hint":"扣掉餘數後，必須是兩數最小公倍數的倍數。","source":"新增試題五｜同概念變化題","paper":2,"concept":"同餘與公倍數","visual":null},{"id":"T02_21","zone":"speed","q":"巴士每 18 分鐘一班，首班 6:00，第 10 班是幾點？","choices":["9:00","8:42","8:24","9:18"],"answer":"8:42","hint":"第 n 班和第一班之間有 n−1 個間隔。","source":"新增試題五｜同概念變化題","paper":2,"concept":"班次間隔","visual":null},{"id":"T02_22","zone":"speed","q":"同一段路，去程每分鐘 50 公尺，回程每分鐘 75 公尺，往返平均速率每分鐘多少公尺？","choices":["62","60","75","50"],"answer":"60","hint":"同距離來回平均速率＝2ab/(a+b)。","source":"新增試題五｜同概念變化題","paper":2,"concept":"往返平均速率","visual":null},{"id":"T02_23","zone":"speed","q":"4 位同學 4 分鐘打掃 4 間教室；同樣人數、同樣速度，打掃 28 間需幾分鐘？","choices":["24","32","28","112"],"answer":"28","hint":"工作效率不變，教室數是幾倍，時間就幾倍。","source":"新增試題五｜同概念變化題","paper":2,"concept":"工作效率","visual":null},{"id":"T02_24","zone":"speed","q":"兩列火車長 60 與 80 公尺，迎面而行，第一列秒速 4 公尺，從相遇到完全錯開共 10 秒，第二列秒速多少公尺？","choices":["12","10","9","11"],"answer":"10","hint":"兩列車的長度和÷時間＝相對速度，再扣掉第一列速度。","source":"新增試題五｜同概念變化題","paper":2,"concept":"相向火車","visual":null},{"id":"T02_25","zone":"speed","q":"燈塔閃 4 下共花 12 秒，每次間隔相同，閃 7 下花幾秒？","choices":["25","20","28","24"],"answer":"24","hint":"閃 n 下只有 n−1 個間隔。","source":"新增試題五｜同概念變化題","paper":2,"concept":"時間間隔","visual":null},{"id":"T02_26","zone":"boss","q":"爸爸比孩子大 16 歲，3 年後爸爸年齡是孩子的 3 倍，爸爸今年幾歲？","choices":["21","22","24","5"],"answer":"21","hint":"設孩子今年 x 歲，年齡差固定。","source":"新增試題五｜同概念變化題","paper":2,"concept":"年齡倍數","visual":null},{"id":"T02_27","zone":"boss","q":"正方形廣場邊長 80 公尺，每隔 5 公尺沿封閉周界種一棵樹（四角都有），共種幾棵？","choices":["64","65","60","68"],"answer":"64","hint":"封閉路線棵數＝總周長÷間距，不要再加 1。","source":"新增試題五｜同概念變化題","paper":2,"concept":"封閉植樹","visual":null},{"id":"T02_28","zone":"boss","q":"魔法商店全館打 8 折，付了 72 金幣，原價多少金幣？","choices":["90","100","72","80"],"answer":"90","hint":"用實付價格除以折扣率。","source":"新增試題五｜同概念變化題","paper":2,"concept":"逆向百分率","visual":null},{"id":"T02_29","zone":"boss","q":"一列數字為 4、7、10……共 6 個，總和是多少？","choices":["66","69","72","75"],"answer":"69","hint":"等差數列總和＝（首項＋末項）×項數÷2。","source":"新增試題五｜同概念變化題","paper":2,"concept":"等差數列","visual":null},{"id":"T02_30","zone":"boss","q":"7 個連續整數總和為 406，最小的整數是多少？","choices":["56","54","58","55"],"answer":"55","hint":"奇數個連續整數的平均數就是中間那個數。","source":"新增試題五｜同概念變化題","paper":2,"concept":"連續整數","visual":null},{"id":"T03_01","zone":"forest","q":"12 + 5 × 4 − 7 = ?","choices":["30","25","39","14"],"answer":"25","hint":"先乘法，後加減。","source":"新增試題六｜同概念變化題","paper":3,"concept":"四則運算","visual":null},{"id":"T03_02","zone":"forest","q":"43 × 11 − 43 × 6 = ?","choices":["215","430","258","731"],"answer":"215","hint":"利用分配律：共同因數乘以兩數之差。","source":"新增試題六｜同概念變化題","paper":3,"concept":"分配律","visual":null},{"id":"T03_03","zone":"forest","q":"0.30 + 0.6 = ?","choices":["1.00","0.90","1.90","0.89"],"answer":"0.90","hint":"小數點對齊後相加。","source":"新增試題六｜同概念變化題","paper":3,"concept":"小數計算","visual":null},{"id":"T03_04","zone":"forest","q":"30 + 7 × □ = 114，□ 是多少？","choices":["11","14","12","13"],"answer":"12","hint":"先移項，再除以乘數。","source":"新增試題六｜同概念變化題","paper":3,"concept":"未知數","visual":null},{"id":"T03_05","zone":"forest","q":"3/6 + 2/6 = ?（約成最簡分數）","choices":["其他答案1","其他答案2","5/6","6/6"],"answer":"5/6","hint":"同分母先加分子，再約分。","source":"新增試題六｜同概念變化題","paper":3,"concept":"分數加法","visual":null},{"id":"T03_06","zone":"geometry","q":"兩根木條長 6、17 公分，第三根長度哪一個「不能」組成三角形？","choices":["12","24","22","23"],"answer":"23","hint":"三角形任兩邊和必須嚴格大於第三邊。","source":"新增試題六｜同概念變化題","paper":3,"concept":"三角形不等式","visual":null},{"id":"T03_07","zone":"geometry","q":"正 8 邊形共有幾條對角線？","choices":["24","20","12","28"],"answer":"20","hint":"每個頂點連 n−3 條，除以 2 避免重複。","source":"新增試題六｜同概念變化題","paper":3,"concept":"多邊形對角線","visual":null},{"id":"T03_08","zone":"geometry","q":"等腰三角形兩個底角都是 50°，頂角是多少度？","choices":["130°","90°","50°","80°"],"answer":"80°","hint":"三角形內角和 180°，扣掉兩個底角。","source":"新增試題六｜同概念變化題","paper":3,"concept":"三角形內角","visual":null},{"id":"T03_09","zone":"geometry","q":"一個正方形邊長 7 公分，放大成 3 倍後，面積是原來的幾倍？","choices":["3","6","9","12"],"answer":"9","hint":"面積倍率＝長度倍率的平方。","source":"新增試題六｜同概念變化題","paper":3,"concept":"面積倍率","visual":null},{"id":"T03_10","zone":"geometry","q":"一個 7 角柱有幾個面、幾條邊？","choices":["7面、14邊","9面、21邊","8面、21邊","9面、14邊"],"answer":"9面、21邊","hint":"n 角柱有 n+2 個面與 3n 條邊。","source":"新增試題六｜同概念變化題","paper":3,"concept":"角柱","visual":null},{"id":"T03_11","zone":"ratio","q":"一件裝備打 8 折後賣 480 元，原價多少元？","choices":["480","700","500","600"],"answer":"600","hint":"打折後價格÷折數對應的小數。","source":"新增試題六｜同概念變化題","paper":3,"concept":"百分率","visual":null},{"id":"T03_12","zone":"ratio","q":"80 顆寶石依 7：3 分成兩堆，較多的一堆有幾顆？","choices":["56","24","64","40"],"answer":"56","hint":"先求每一份，再乘較大的比例份數。","source":"新增試題六｜同概念變化題","paper":3,"concept":"比例分配","visual":null},{"id":"T03_13","zone":"ratio","q":"男生 14 人平均 32 公斤，女生 14 人平均 38 公斤，全班體重總和多少公斤？","choices":["942","896","1012","980"],"answer":"980","hint":"人數乘平均值，再把兩組總和相加。","source":"新增試題六｜同概念變化題","paper":3,"concept":"加權平均","visual":null},{"id":"T03_14","zone":"ratio","q":"一箱餅乾先送出 4/7，剩下 18 片，原來有幾片？","choices":["48","42","36","18"],"answer":"42","hint":"剩下的分率是 (分母−分子)/分母。","source":"新增試題六｜同概念變化題","paper":3,"concept":"分數應用","visual":null},{"id":"T03_15","zone":"ratio","q":"地圖比例尺 1：100,000，圖上 4 公分，實際距離幾公尺？","choices":["4000","40000","400","4100"],"answer":"4000","hint":"圖上公分數乘比例尺分母，再除以 100 變成公尺。","source":"新增試題六｜同概念變化題","paper":3,"concept":"比例尺","visual":null},{"id":"T03_16","zone":"multiples","q":"18 與 27 的最大公因數是多少？","choices":["4","9","18","10"],"answer":"9","hint":"質因數分解或短除法。","source":"新增試題六｜同概念變化題","paper":3,"concept":"最大公因數","visual":null},{"id":"T03_17","zone":"multiples","q":"10 和 15 的最小公倍數是多少？","choices":["30","150","15","40"],"answer":"30","hint":"先求最大公因數，再用兩數相乘除以最大公因數。","source":"新增試題六｜同概念變化題","paper":3,"concept":"最小公倍數","visual":null},{"id":"T03_18","zone":"multiples","q":"三位數 89□ 同時是 2 和 3 的倍數，□ 可以填哪個數字？","choices":["3","5","4","1"],"answer":"4","hint":"個位要是偶數，且各位數字和能被 3 整除。","source":"新增試題六｜同概念變化題","paper":3,"concept":"整除判別","visual":null},{"id":"T03_19","zone":"multiples","q":"🔴、🟡、🟢、🔵、🟣 不斷循環，第 91 個是哪個？","choices":["🔴","🔵","🟡","🟢"],"answer":"🔴","hint":"以 5 為一輪，注意餘數 0 對應第 5 個。","source":"新增試題六｜同概念變化題","paper":3,"concept":"週期規律","visual":null},{"id":"T03_20","zone":"multiples","q":"寶石每 3 個或每 5 個分組都剩 2 個，不超過 125 顆時最多有幾顆？","choices":["122","120","107","137"],"answer":"122","hint":"扣掉餘數後，必須是兩數最小公倍數的倍數。","source":"新增試題六｜同概念變化題","paper":3,"concept":"同餘與公倍數","visual":null},{"id":"T03_21","zone":"speed","q":"巴士每 15 分鐘一班，首班 8:10，第 6 班是幾點？","choices":["9:55","9:40","9:10","9:25"],"answer":"9:25","hint":"第 n 班和第一班之間有 n−1 個間隔。","source":"新增試題六｜同概念變化題","paper":3,"concept":"班次間隔","visual":null},{"id":"T03_22","zone":"speed","q":"同一段路，去程每分鐘 60 公尺，回程每分鐘 90 公尺，往返平均速率每分鐘多少公尺？","choices":["72","60","90","75"],"answer":"72","hint":"同距離來回平均速率＝2ab/(a+b)。","source":"新增試題六｜同概念變化題","paper":3,"concept":"往返平均速率","visual":null},{"id":"T03_23","zone":"speed","q":"7 位同學 4 分鐘打掃 7 間教室；同樣人數、同樣速度，打掃 56 間需幾分鐘？","choices":["32","28","36","224"],"answer":"32","hint":"工作效率不變，教室數是幾倍，時間就幾倍。","source":"新增試題六｜同概念變化題","paper":3,"concept":"工作效率","visual":null},{"id":"T03_24","zone":"speed","q":"兩列火車長 60 與 150 公尺，迎面而行，第一列秒速 10 公尺，從相遇到完全錯開共 10 秒，第二列秒速多少公尺？","choices":["13","10","11","12"],"answer":"11","hint":"兩列車的長度和÷時間＝相對速度，再扣掉第一列速度。","source":"新增試題六｜同概念變化題","paper":3,"concept":"相向火車","visual":null},{"id":"T03_25","zone":"speed","q":"燈塔閃 5 下共花 12 秒，每次間隔相同，閃 11 下花幾秒？","choices":["31","33","27","30"],"answer":"30","hint":"閃 n 下只有 n−1 個間隔。","source":"新增試題六｜同概念變化題","paper":3,"concept":"時間間隔","visual":null},{"id":"T03_26","zone":"boss","q":"爸爸比孩子大 34 歲，6 年後爸爸年齡是孩子的 3 倍，爸爸今年幾歲？","choices":["48","51","11","45"],"answer":"45","hint":"設孩子今年 x 歲，年齡差固定。","source":"新增試題六｜同概念變化題","paper":3,"concept":"年齡倍數","visual":null},{"id":"T03_27","zone":"boss","q":"正方形廣場邊長 50 公尺，每隔 10 公尺沿封閉周界種一棵樹（四角都有），共種幾棵？","choices":["21","16","24","20"],"answer":"20","hint":"封閉路線棵數＝總周長÷間距，不要再加 1。","source":"新增試題六｜同概念變化題","paper":3,"concept":"封閉植樹","visual":null},{"id":"T03_28","zone":"boss","q":"魔法商店全館打 7 折，付了 112 金幣，原價多少金幣？","choices":["160","112","170","150"],"answer":"160","hint":"用實付價格除以折扣率。","source":"新增試題六｜同概念變化題","paper":3,"concept":"逆向百分率","visual":null},{"id":"T03_29","zone":"boss","q":"一列數字為 17、19、21……共 7 個，總和是多少？","choices":["163","168","159","161"],"answer":"161","hint":"等差數列總和＝（首項＋末項）×項數÷2。","source":"新增試題六｜同概念變化題","paper":3,"concept":"等差數列","visual":null},{"id":"T03_30","zone":"boss","q":"7 個連續整數總和為 203，最小的整數是多少？","choices":["25","27","29","26"],"answer":"26","hint":"奇數個連續整數的平均數就是中間那個數。","source":"新增試題六｜同概念變化題","paper":3,"concept":"連續整數","visual":null},{"id":"T04_01","zone":"forest","q":"10 + 4 × 5 − 3 = ?","choices":["27","31","33","16"],"answer":"27","hint":"先乘法，後加減。","source":"新增試題七｜同概念變化題","paper":4,"concept":"四則運算","visual":null},{"id":"T04_02","zone":"forest","q":"19 × 9 − 19 × 6 = ?","choices":["285","57","152","76"],"answer":"57","hint":"利用分配律：共同因數乘以兩數之差。","source":"新增試題七｜同概念變化題","paper":4,"concept":"分配律","visual":null},{"id":"T04_03","zone":"forest","q":"0.18 + 0.7 = ?","choices":["0.98","1.88","0.87","0.88"],"answer":"0.88","hint":"小數點對齊後相加。","source":"新增試題七｜同概念變化題","paper":4,"concept":"小數計算","visual":null},{"id":"T04_04","zone":"forest","q":"20 + 4 × □ = 32，□ 是多少？","choices":["2","3","5","4"],"answer":"3","hint":"先移項，再除以乘數。","source":"新增試題七｜同概念變化題","paper":4,"concept":"未知數","visual":null},{"id":"T04_05","zone":"forest","q":"3/10 + 3/10 = ?（約成最簡分數）","choices":["6/10","9/10","7/10","3/5"],"answer":"3/5","hint":"同分母先加分子，再約分。","source":"新增試題七｜同概念變化題","paper":4,"concept":"分數加法","visual":null},{"id":"T04_06","zone":"geometry","q":"兩根木條長 4、8 公分，第三根長度哪一個「不能」組成三角形？","choices":["13","12","5","11"],"answer":"12","hint":"三角形任兩邊和必須嚴格大於第三邊。","source":"新增試題七｜同概念變化題","paper":4,"concept":"三角形不等式","visual":null},{"id":"T04_07","zone":"geometry","q":"正 11 邊形共有幾條對角線？","choices":["49","33","55","44"],"answer":"44","hint":"每個頂點連 n−3 條，除以 2 避免重複。","source":"新增試題七｜同概念變化題","paper":4,"concept":"多邊形對角線","visual":null},{"id":"T04_08","zone":"geometry","q":"等腰三角形兩個底角都是 70°，頂角是多少度？","choices":["110°","70°","40°","50°"],"answer":"40°","hint":"三角形內角和 180°，扣掉兩個底角。","source":"新增試題七｜同概念變化題","paper":4,"concept":"三角形內角","visual":null},{"id":"T04_09","zone":"geometry","q":"一個正方形邊長 12 公分，放大成 4 倍後，面積是原來的幾倍？","choices":["16","4","20","8"],"answer":"16","hint":"面積倍率＝長度倍率的平方。","source":"新增試題七｜同概念變化題","paper":4,"concept":"面積倍率","visual":null},{"id":"T04_10","zone":"geometry","q":"一個 6 角柱有幾個面、幾條邊？","choices":["8面、12邊","8面、18邊","6面、12邊","7面、18邊"],"answer":"8面、18邊","hint":"n 角柱有 n+2 個面與 3n 條邊。","source":"新增試題七｜同概念變化題","paper":4,"concept":"角柱","visual":null},{"id":"T04_11","zone":"ratio","q":"一件裝備打 8 折後賣 1360 元，原價多少元？","choices":["1360","1600","1800","1700"],"answer":"1700","hint":"打折後價格÷折數對應的小數。","source":"新增試題七｜同概念變化題","paper":4,"concept":"百分率","visual":null},{"id":"T04_12","zone":"ratio","q":"176 顆寶石依 5：6 分成兩堆，較多的一堆有幾顆？","choices":["88","96","112","80"],"answer":"96","hint":"先求每一份，再乘較大的比例份數。","source":"新增試題七｜同概念變化題","paper":4,"concept":"比例分配","visual":null},{"id":"T04_13","zone":"ratio","q":"男生 13 人平均 26 公斤，女生 8 人平均 28 公斤，全班體重總和多少公斤？","choices":["534","588","546","562"],"answer":"562","hint":"人數乘平均值，再把兩組總和相加。","source":"新增試題七｜同概念變化題","paper":4,"concept":"加權平均","visual":null},{"id":"T04_14","zone":"ratio","q":"一箱餅乾先送出 5/9，剩下 40 片，原來有幾片？","choices":["40","100","80","90"],"answer":"90","hint":"剩下的分率是 (分母−分子)/分母。","source":"新增試題七｜同概念變化題","paper":4,"concept":"分數應用","visual":null},{"id":"T04_15","zone":"ratio","q":"地圖比例尺 1：20,000，圖上 3 公分，實際距離幾公尺？","choices":["700","6000","600","60"],"answer":"600","hint":"圖上公分數乘比例尺分母，再除以 100 變成公尺。","source":"新增試題七｜同概念變化題","paper":4,"concept":"比例尺","visual":null},{"id":"T04_16","zone":"multiples","q":"16 與 56 的最大公因數是多少？","choices":["9","8","4","16"],"answer":"8","hint":"質因數分解或短除法。","source":"新增試題七｜同概念變化題","paper":4,"concept":"最大公因數","visual":null},{"id":"T04_17","zone":"multiples","q":"10 和 15 的最小公倍數是多少？","choices":["30","15","40","150"],"answer":"30","hint":"先求最大公因數，再用兩數相乘除以最大公因數。","source":"新增試題七｜同概念變化題","paper":4,"concept":"最小公倍數","visual":null},{"id":"T04_18","zone":"multiples","q":"三位數 61□ 同時是 2 和 3 的倍數，□ 可以填哪個數字？","choices":["8","5","3","1"],"answer":"8","hint":"個位要是偶數，且各位數字和能被 3 整除。","source":"新增試題七｜同概念變化題","paper":4,"concept":"整除判別","visual":null},{"id":"T04_19","zone":"multiples","q":"🔴、🟡、🟢、🔵、🟣 不斷循環，第 128 個是哪個？","choices":["🔴","🔵","🟡","🟢"],"answer":"🟢","hint":"以 5 為一輪，注意餘數 0 對應第 5 個。","source":"新增試題七｜同概念變化題","paper":4,"concept":"週期規律","visual":null},{"id":"T04_20","zone":"multiples","q":"寶石每 6 個或每 8 個分組都剩 5 個，不超過 133 顆時最多有幾顆？","choices":["120","101","125","149"],"answer":"125","hint":"扣掉餘數後，必須是兩數最小公倍數的倍數。","source":"新增試題七｜同概念變化題","paper":4,"concept":"同餘與公倍數","visual":null},{"id":"T04_21","zone":"speed","q":"巴士每 20 分鐘一班，首班 9:10，第 6 班是幾點？","choices":["10:50","10:30","11:30","11:10"],"answer":"10:50","hint":"第 n 班和第一班之間有 n−1 個間隔。","source":"新增試題七｜同概念變化題","paper":4,"concept":"班次間隔","visual":null},{"id":"T04_22","zone":"speed","q":"同一段路，去程每分鐘 60 公尺，回程每分鐘 90 公尺，往返平均速率每分鐘多少公尺？","choices":["60","75","90","72"],"answer":"72","hint":"同距離來回平均速率＝2ab/(a+b)。","source":"新增試題七｜同概念變化題","paper":4,"concept":"往返平均速率","visual":null},{"id":"T04_23","zone":"speed","q":"7 位同學 7 分鐘打掃 7 間教室；同樣人數、同樣速度，打掃 28 間需幾分鐘？","choices":["21","35","196","28"],"answer":"28","hint":"工作效率不變，教室數是幾倍，時間就幾倍。","source":"新增試題七｜同概念變化題","paper":4,"concept":"工作效率","visual":null},{"id":"T04_24","zone":"speed","q":"兩列火車長 40 與 56 公尺，迎面而行，第一列秒速 4 公尺，從相遇到完全錯開共 8 秒，第二列秒速多少公尺？","choices":["9","7","8","10"],"answer":"8","hint":"兩列車的長度和÷時間＝相對速度，再扣掉第一列速度。","source":"新增試題七｜同概念變化題","paper":4,"concept":"相向火車","visual":null},{"id":"T04_25","zone":"speed","q":"燈塔閃 4 下共花 18 秒，每次間隔相同，閃 9 下花幾秒？","choices":["42","48","54","49"],"answer":"48","hint":"閃 n 下只有 n−1 個間隔。","source":"新增試題七｜同概念變化題","paper":4,"concept":"時間間隔","visual":null},{"id":"T04_26","zone":"boss","q":"爸爸比孩子大 34 歲，6 年後爸爸年齡是孩子的 3 倍，爸爸今年幾歲？","choices":["48","51","11","45"],"answer":"45","hint":"設孩子今年 x 歲，年齡差固定。","source":"新增試題七｜同概念變化題","paper":4,"concept":"年齡倍數","visual":null},{"id":"T04_27","zone":"boss","q":"正方形廣場邊長 80 公尺，每隔 5 公尺沿封閉周界種一棵樹（四角都有），共種幾棵？","choices":["60","65","64","68"],"answer":"64","hint":"封閉路線棵數＝總周長÷間距，不要再加 1。","source":"新增試題七｜同概念變化題","paper":4,"concept":"封閉植樹","visual":null},{"id":"T04_28","zone":"boss","q":"魔法商店全館打 5 折，付了 95 金幣，原價多少金幣？","choices":["180","200","190","95"],"answer":"190","hint":"用實付價格除以折扣率。","source":"新增試題七｜同概念變化題","paper":4,"concept":"逆向百分率","visual":null},{"id":"T04_29","zone":"boss","q":"一列數字為 2、9、16……共 5 個，總和是多少？","choices":["85","87","80","73"],"answer":"80","hint":"等差數列總和＝（首項＋末項）×項數÷2。","source":"新增試題七｜同概念變化題","paper":4,"concept":"等差數列","visual":null},{"id":"T04_30","zone":"boss","q":"9 個連續整數總和為 216，最小的整數是多少？","choices":["20","21","24","19"],"answer":"20","hint":"奇數個連續整數的平均數就是中間那個數。","source":"新增試題七｜同概念變化題","paper":4,"concept":"連續整數","visual":null},{"id":"T05_01","zone":"forest","q":"19 + 7 × 5 − 4 = ?","choices":["58","57","27","50"],"answer":"50","hint":"先乘法，後加減。","source":"新增試題八｜同概念變化題","paper":5,"concept":"四則運算","visual":null},{"id":"T05_02","zone":"forest","q":"41 × 11 − 41 × 2 = ?","choices":["369","370","533","410"],"answer":"369","hint":"利用分配律：共同因數乘以兩數之差。","source":"新增試題八｜同概念變化題","paper":5,"concept":"分配律","visual":null},{"id":"T05_03","zone":"forest","q":"0.54 + 0.3 = ?","choices":["0.83","0.84","0.94","1.84"],"answer":"0.84","hint":"小數點對齊後相加。","source":"新增試題八｜同概念變化題","paper":5,"concept":"小數計算","visual":null},{"id":"T05_04","zone":"forest","q":"28 + 4 × □ = 80，□ 是多少？","choices":["15","13","12","14"],"answer":"13","hint":"先移項，再除以乘數。","source":"新增試題八｜同概念變化題","paper":5,"concept":"未知數","visual":null},{"id":"T05_05","zone":"forest","q":"3/6 + 3/6 = ?（約成最簡分數）","choices":["9/6","1","6/6","7/6"],"answer":"1","hint":"同分母先加分子，再約分。","source":"新增試題八｜同概念變化題","paper":5,"concept":"分數加法","visual":null},{"id":"T05_06","zone":"geometry","q":"兩根木條長 6、13 公分，第三根長度哪一個「不能」組成三角形？","choices":["8","18","17","19"],"answer":"19","hint":"三角形任兩邊和必須嚴格大於第三邊。","source":"新增試題八｜同概念變化題","paper":5,"concept":"三角形不等式","visual":null},{"id":"T05_07","zone":"geometry","q":"正 12 邊形共有幾條對角線？","choices":["66","54","42","60"],"answer":"54","hint":"每個頂點連 n−3 條，除以 2 避免重複。","source":"新增試題八｜同概念變化題","paper":5,"concept":"多邊形對角線","visual":null},{"id":"T05_08","zone":"geometry","q":"等腰三角形兩個底角都是 40°，頂角是多少度？","choices":["40°","110°","100°","140°"],"answer":"100°","hint":"三角形內角和 180°，扣掉兩個底角。","source":"新增試題八｜同概念變化題","paper":5,"concept":"三角形內角","visual":null},{"id":"T05_09","zone":"geometry","q":"一個正方形邊長 11 公分，放大成 2 倍後，面積是原來的幾倍？","choices":["5","4","2","6"],"answer":"4","hint":"面積倍率＝長度倍率的平方。","source":"新增試題八｜同概念變化題","paper":5,"concept":"面積倍率","visual":null},{"id":"T05_10","zone":"geometry","q":"一個 5 角柱有幾個面、幾條邊？","choices":["7面、15邊","6面、15邊","5面、10邊","7面、10邊"],"answer":"7面、15邊","hint":"n 角柱有 n+2 個面與 3n 條邊。","source":"新增試題八｜同概念變化題","paper":5,"concept":"角柱","visual":null},{"id":"T05_11","zone":"ratio","q":"一件裝備打 8 折後賣 720 元，原價多少元？","choices":["900","720","1000","800"],"answer":"900","hint":"打折後價格÷折數對應的小數。","source":"新增試題八｜同概念變化題","paper":5,"concept":"百分率","visual":null},{"id":"T05_12","zone":"ratio","q":"119 顆寶石依 2：5 分成兩堆，較多的一堆有幾顆？","choices":["85","102","59","34"],"answer":"85","hint":"先求每一份，再乘較大的比例份數。","source":"新增試題八｜同概念變化題","paper":5,"concept":"比例分配","visual":null},{"id":"T05_13","zone":"ratio","q":"男生 9 人平均 30 公斤，女生 9 人平均 32 公斤，全班體重總和多少公斤？","choices":["540","526","588","558"],"answer":"558","hint":"人數乘平均值，再把兩組總和相加。","source":"新增試題八｜同概念變化題","paper":5,"concept":"加權平均","visual":null},{"id":"T05_14","zone":"ratio","q":"一箱餅乾先送出 3/5，剩下 22 片，原來有幾片？","choices":["44","55","66","22"],"answer":"55","hint":"剩下的分率是 (分母−分子)/分母。","source":"新增試題八｜同概念變化題","paper":5,"concept":"分數應用","visual":null},{"id":"T05_15","zone":"ratio","q":"地圖比例尺 1：10,000，圖上 7 公分，實際距離幾公尺？","choices":["70","7000","700","800"],"answer":"700","hint":"圖上公分數乘比例尺分母，再除以 100 變成公尺。","source":"新增試題八｜同概念變化題","paper":5,"concept":"比例尺","visual":null},{"id":"T05_16","zone":"multiples","q":"12 與 30 的最大公因數是多少？","choices":["7","3","6","12"],"answer":"6","hint":"質因數分解或短除法。","source":"新增試題八｜同概念變化題","paper":5,"concept":"最大公因數","visual":null},{"id":"T05_17","zone":"multiples","q":"12 和 18 的最小公倍數是多少？","choices":["18","36","48","216"],"answer":"36","hint":"先求最大公因數，再用兩數相乘除以最大公因數。","source":"新增試題八｜同概念變化題","paper":5,"concept":"最小公倍數","visual":null},{"id":"T05_18","zone":"multiples","q":"三位數 38□ 同時是 2 和 3 的倍數，□ 可以填哪個數字？","choices":["4","3","5","1"],"answer":"4","hint":"個位要是偶數，且各位數字和能被 3 整除。","source":"新增試題八｜同概念變化題","paper":5,"concept":"整除判別","visual":null},{"id":"T05_19","zone":"multiples","q":"🔴、🟡、🟢、🔵、🟣 不斷循環，第 186 個是哪個？","choices":["🟡","🔴","🔵","🟢"],"answer":"🔴","hint":"以 5 為一輪，注意餘數 0 對應第 5 個。","source":"新增試題八｜同概念變化題","paper":5,"concept":"週期規律","visual":null},{"id":"T05_20","zone":"multiples","q":"寶石每 3 個或每 5 個分組都剩 2 個，不超過 114 顆時最多有幾顆？","choices":["107","105","92","122"],"answer":"107","hint":"扣掉餘數後，必須是兩數最小公倍數的倍數。","source":"新增試題八｜同概念變化題","paper":5,"concept":"同餘與公倍數","visual":null},{"id":"T05_21","zone":"speed","q":"巴士每 20 分鐘一班，首班 6:00，第 9 班是幾點？","choices":["9:00","8:40","9:20","8:20"],"answer":"8:40","hint":"第 n 班和第一班之間有 n−1 個間隔。","source":"新增試題八｜同概念變化題","paper":5,"concept":"班次間隔","visual":null},{"id":"T05_22","zone":"speed","q":"同一段路，去程每分鐘 40 公尺，回程每分鐘 60 公尺，往返平均速率每分鐘多少公尺？","choices":["50","48","40","60"],"answer":"48","hint":"同距離來回平均速率＝2ab/(a+b)。","source":"新增試題八｜同概念變化題","paper":5,"concept":"往返平均速率","visual":null},{"id":"T05_23","zone":"speed","q":"8 位同學 2 分鐘打掃 8 間教室；同樣人數、同樣速度，打掃 48 間需幾分鐘？","choices":["10","96","14","12"],"answer":"12","hint":"工作效率不變，教室數是幾倍，時間就幾倍。","source":"新增試題八｜同概念變化題","paper":5,"concept":"工作效率","visual":null},{"id":"T05_24","zone":"speed","q":"兩列火車長 80 與 80 公尺，迎面而行，第一列秒速 5 公尺，從相遇到完全錯開共 16 秒，第二列秒速多少公尺？","choices":["6","4","5","7"],"answer":"5","hint":"兩列車的長度和÷時間＝相對速度，再扣掉第一列速度。","source":"新增試題八｜同概念變化題","paper":5,"concept":"相向火車","visual":null},{"id":"T05_25","zone":"speed","q":"燈塔閃 6 下共花 25 秒，每次間隔相同，閃 9 下花幾秒？","choices":["40","45","35","41"],"answer":"40","hint":"閃 n 下只有 n−1 個間隔。","source":"新增試題八｜同概念變化題","paper":5,"concept":"時間間隔","visual":null},{"id":"T05_26","zone":"boss","q":"爸爸比孩子大 40 歲，8 年後爸爸年齡是孩子的 3 倍，爸爸今年幾歲？","choices":["55","52","12","60"],"answer":"52","hint":"設孩子今年 x 歲，年齡差固定。","source":"新增試題八｜同概念變化題","paper":5,"concept":"年齡倍數","visual":null},{"id":"T05_27","zone":"boss","q":"正方形廣場邊長 80 公尺，每隔 10 公尺沿封閉周界種一棵樹（四角都有），共種幾棵？","choices":["32","28","36","33"],"answer":"32","hint":"封閉路線棵數＝總周長÷間距，不要再加 1。","source":"新增試題八｜同概念變化題","paper":5,"concept":"封閉植樹","visual":null},{"id":"T05_28","zone":"boss","q":"魔法商店全館打 6 折，付了 72 金幣，原價多少金幣？","choices":["120","72","130","110"],"answer":"120","hint":"用實付價格除以折扣率。","source":"新增試題八｜同概念變化題","paper":5,"concept":"逆向百分率","visual":null},{"id":"T05_29","zone":"boss","q":"一列數字為 17、21、25……共 8 個，總和是多少？","choices":["244","256","252","248"],"answer":"248","hint":"等差數列總和＝（首項＋末項）×項數÷2。","source":"新增試題八｜同概念變化題","paper":5,"concept":"等差數列","visual":null},{"id":"T05_30","zone":"boss","q":"7 個連續整數總和為 350，最小的整數是多少？","choices":["46","47","48","50"],"answer":"47","hint":"奇數個連續整數的平均數就是中間那個數。","source":"新增試題八｜同概念變化題","paper":5,"concept":"連續整數","visual":null},{"id":"T06_01","zone":"forest","q":"26 + 5 × 5 − 6 = ?","choices":["45","57","30","50"],"answer":"45","hint":"先乘法，後加減。","source":"新增試題九｜同概念變化題","paper":6,"concept":"四則運算","visual":null},{"id":"T06_02","zone":"forest","q":"31 × 9 − 31 × 5 = ?","choices":["248","434","155","124"],"answer":"124","hint":"利用分配律：共同因數乘以兩數之差。","source":"新增試題九｜同概念變化題","paper":6,"concept":"分配律","visual":null},{"id":"T06_03","zone":"forest","q":"0.44 + 0.4 = ?","choices":["0.84","0.83","0.94","1.84"],"answer":"0.84","hint":"小數點對齊後相加。","source":"新增試題九｜同概念變化題","paper":6,"concept":"小數計算","visual":null},{"id":"T06_04","zone":"forest","q":"17 + 8 × □ = 49，□ 是多少？","choices":["5","4","6","3"],"answer":"4","hint":"先移項，再除以乘數。","source":"新增試題九｜同概念變化題","paper":6,"concept":"未知數","visual":null},{"id":"T06_05","zone":"forest","q":"1/12 + 5/12 = ?（約成最簡分數）","choices":["6/12","7/12","1/2","5/12"],"answer":"1/2","hint":"同分母先加分子，再約分。","source":"新增試題九｜同概念變化題","paper":6,"concept":"分數加法","visual":null},{"id":"T06_06","zone":"geometry","q":"兩根木條長 12、9 公分，第三根長度哪一個「不能」組成三角形？","choices":["22","20","21","4"],"answer":"21","hint":"三角形任兩邊和必須嚴格大於第三邊。","source":"新增試題九｜同概念變化題","paper":6,"concept":"三角形不等式","visual":null},{"id":"T06_07","zone":"geometry","q":"正 7 邊形共有幾條對角線？","choices":["7","21","17","14"],"answer":"14","hint":"每個頂點連 n−3 條，除以 2 避免重複。","source":"新增試題九｜同概念變化題","paper":6,"concept":"多邊形對角線","visual":null},{"id":"T06_08","zone":"geometry","q":"等腰三角形兩個底角都是 60°，頂角是多少度？","choices":["其他答案1","120°","60°","70°"],"answer":"60°","hint":"三角形內角和 180°，扣掉兩個底角。","source":"新增試題九｜同概念變化題","paper":6,"concept":"三角形內角","visual":null},{"id":"T06_09","zone":"geometry","q":"一個正方形邊長 6 公分，放大成 2 倍後，面積是原來的幾倍？","choices":["4","6","2","5"],"answer":"4","hint":"面積倍率＝長度倍率的平方。","source":"新增試題九｜同概念變化題","paper":6,"concept":"面積倍率","visual":null},{"id":"T06_10","zone":"geometry","q":"一個 3 角柱有幾個面、幾條邊？","choices":["5面、9邊","5面、6邊","3面、6邊","4面、9邊"],"answer":"5面、9邊","hint":"n 角柱有 n+2 個面與 3n 條邊。","source":"新增試題九｜同概念變化題","paper":6,"concept":"角柱","visual":null},{"id":"T06_11","zone":"ratio","q":"一件裝備打 7 折後賣 560 元，原價多少元？","choices":["560","700","800","900"],"answer":"800","hint":"打折後價格÷折數對應的小數。","source":"新增試題九｜同概念變化題","paper":6,"concept":"百分率","visual":null},{"id":"T06_12","zone":"ratio","q":"168 顆寶石依 7：7 分成兩堆，較多的一堆有幾顆？","choices":["84","82","85","96"],"answer":"84","hint":"先求每一份，再乘較大的比例份數。","source":"新增試題九｜同概念變化題","paper":6,"concept":"比例分配","visual":null},{"id":"T06_13","zone":"ratio","q":"男生 9 人平均 29 公斤，女生 14 人平均 26 公斤，全班體重總和多少公斤？","choices":["654","625","599","667"],"answer":"625","hint":"人數乘平均值，再把兩組總和相加。","source":"新增試題九｜同概念變化題","paper":6,"concept":"加權平均","visual":null},{"id":"T06_14","zone":"ratio","q":"一箱餅乾先送出 1/5，剩下 20 片，原來有幾片？","choices":["30","26","25","20"],"answer":"25","hint":"剩下的分率是 (分母−分子)/分母。","source":"新增試題九｜同概念變化題","paper":6,"concept":"分數應用","visual":null},{"id":"T06_15","zone":"ratio","q":"地圖比例尺 1：50,000，圖上 6 公分，實際距離幾公尺？","choices":["3000","30000","300","3100"],"answer":"3000","hint":"圖上公分數乘比例尺分母，再除以 100 變成公尺。","source":"新增試題九｜同概念變化題","paper":6,"concept":"比例尺","visual":null},{"id":"T06_16","zone":"multiples","q":"72 與 45 的最大公因數是多少？","choices":["10","9","18","4"],"answer":"9","hint":"質因數分解或短除法。","source":"新增試題九｜同概念變化題","paper":6,"concept":"最大公因數","visual":null},{"id":"T06_17","zone":"multiples","q":"14 和 21 的最小公倍數是多少？","choices":["21","294","56","42"],"answer":"42","hint":"先求最大公因數，再用兩數相乘除以最大公因數。","source":"新增試題九｜同概念變化題","paper":6,"concept":"最小公倍數","visual":null},{"id":"T06_18","zone":"multiples","q":"三位數 68□ 同時是 2 和 3 的倍數，□ 可以填哪個數字？","choices":["5","4","3","1"],"answer":"4","hint":"個位要是偶數，且各位數字和能被 3 整除。","source":"新增試題九｜同概念變化題","paper":6,"concept":"整除判別","visual":null},{"id":"T06_19","zone":"multiples","q":"🔴、🟡、🟢、🔵、🟣 不斷循環，第 131 個是哪個？","choices":["🟢","🟡","🔴","🔵"],"answer":"🔴","hint":"以 5 為一輪，注意餘數 0 對應第 5 個。","source":"新增試題九｜同概念變化題","paper":6,"concept":"週期規律","visual":null},{"id":"T06_20","zone":"multiples","q":"寶石每 4 個或每 7 個分組都剩 3 個，不超過 129 顆時最多有幾顆？","choices":["115","143","87","112"],"answer":"115","hint":"扣掉餘數後，必須是兩數最小公倍數的倍數。","source":"新增試題九｜同概念變化題","paper":6,"concept":"同餘與公倍數","visual":null},{"id":"T06_21","zone":"speed","q":"巴士每 18 分鐘一班，首班 7:30，第 8 班是幾點？","choices":["9:36","9:54","9:18","10:12"],"answer":"9:36","hint":"第 n 班和第一班之間有 n−1 個間隔。","source":"新增試題九｜同概念變化題","paper":6,"concept":"班次間隔","visual":null},{"id":"T06_22","zone":"speed","q":"同一段路，去程每分鐘 40 公尺，回程每分鐘 60 公尺，往返平均速率每分鐘多少公尺？","choices":["60","40","50","48"],"answer":"48","hint":"同距離來回平均速率＝2ab/(a+b)。","source":"新增試題九｜同概念變化題","paper":6,"concept":"往返平均速率","visual":null},{"id":"T06_23","zone":"speed","q":"8 位同學 3 分鐘打掃 8 間教室；同樣人數、同樣速度，打掃 64 間需幾分鐘？","choices":["24","192","21","27"],"answer":"24","hint":"工作效率不變，教室數是幾倍，時間就幾倍。","source":"新增試題九｜同概念變化題","paper":6,"concept":"工作效率","visual":null},{"id":"T06_24","zone":"speed","q":"兩列火車長 50 與 34 公尺，迎面而行，第一列秒速 8 公尺，從相遇到完全錯開共 6 秒，第二列秒速多少公尺？","choices":["5","7","8","6"],"answer":"6","hint":"兩列車的長度和÷時間＝相對速度，再扣掉第一列速度。","source":"新增試題九｜同概念變化題","paper":6,"concept":"相向火車","visual":null},{"id":"T06_25","zone":"speed","q":"燈塔閃 6 下共花 20 秒，每次間隔相同，閃 10 下花幾秒？","choices":["37","40","36","32"],"answer":"36","hint":"閃 n 下只有 n−1 個間隔。","source":"新增試題九｜同概念變化題","paper":6,"concept":"時間間隔","visual":null},{"id":"T06_26","zone":"boss","q":"爸爸比孩子大 45 歲，3 年後爸爸年齡是孩子的 4 倍，爸爸今年幾歲？","choices":["12","60","57","61"],"answer":"57","hint":"設孩子今年 x 歲，年齡差固定。","source":"新增試題九｜同概念變化題","paper":6,"concept":"年齡倍數","visual":null},{"id":"T06_27","zone":"boss","q":"正方形廣場邊長 60 公尺，每隔 20 公尺沿封閉周界種一棵樹（四角都有），共種幾棵？","choices":["8","16","12","13"],"answer":"12","hint":"封閉路線棵數＝總周長÷間距，不要再加 1。","source":"新增試題九｜同概念變化題","paper":6,"concept":"封閉植樹","visual":null},{"id":"T06_28","zone":"boss","q":"魔法商店全館打 7 折，付了 112 金幣，原價多少金幣？","choices":["112","150","160","170"],"answer":"160","hint":"用實付價格除以折扣率。","source":"新增試題九｜同概念變化題","paper":6,"concept":"逆向百分率","visual":null},{"id":"T06_29","zone":"boss","q":"一列數字為 6、8、10……共 5 個，總和是多少？","choices":["48","55","50","52"],"answer":"50","hint":"等差數列總和＝（首項＋末項）×項數÷2。","source":"新增試題九｜同概念變化題","paper":6,"concept":"等差數列","visual":null},{"id":"T06_30","zone":"boss","q":"7 個連續整數總和為 399，最小的整數是多少？","choices":["54","57","55","53"],"answer":"54","hint":"奇數個連續整數的平均數就是中間那個數。","source":"新增試題九｜同概念變化題","paper":6,"concept":"連續整數","visual":null},{"id":"T07_01","zone":"forest","q":"33 + 5 × 5 − 4 = ?","choices":["62","54","59","39"],"answer":"54","hint":"先乘法，後加減。","source":"新增試題十｜同概念變化題","paper":7,"concept":"四則運算","visual":null},{"id":"T07_02","zone":"forest","q":"14 × 18 − 14 × 4 = ?","choices":["210","238","196","308"],"answer":"196","hint":"利用分配律：共同因數乘以兩數之差。","source":"新增試題十｜同概念變化題","paper":7,"concept":"分配律","visual":null},{"id":"T07_03","zone":"forest","q":"0.55 + 0.4 = ?","choices":["0.94","1.05","0.95","1.95"],"answer":"0.95","hint":"小數點對齊後相加。","source":"新增試題十｜同概念變化題","paper":7,"concept":"小數計算","visual":null},{"id":"T07_04","zone":"forest","q":"21 + 2 × □ = 33，□ 是多少？","choices":["7","5","6","8"],"answer":"6","hint":"先移項，再除以乘數。","source":"新增試題十｜同概念變化題","paper":7,"concept":"未知數","visual":null},{"id":"T07_05","zone":"forest","q":"4/12 + 2/12 = ?（約成最簡分數）","choices":["7/12","6/12","8/12","1/2"],"answer":"1/2","hint":"同分母先加分子，再約分。","source":"新增試題十｜同概念變化題","paper":7,"concept":"分數加法","visual":null},{"id":"T07_06","zone":"geometry","q":"兩根木條長 11、7 公分，第三根長度哪一個「不能」組成三角形？","choices":["17","5","15","18"],"answer":"18","hint":"三角形任兩邊和必須嚴格大於第三邊。","source":"新增試題十｜同概念變化題","paper":7,"concept":"三角形不等式","visual":null},{"id":"T07_07","zone":"geometry","q":"正 8 邊形共有幾條對角線？","choices":["12","28","20","24"],"answer":"20","hint":"每個頂點連 n−3 條，除以 2 避免重複。","source":"新增試題十｜同概念變化題","paper":7,"concept":"多邊形對角線","visual":null},{"id":"T07_08","zone":"geometry","q":"等腰三角形兩個底角都是 70°，頂角是多少度？","choices":["50°","40°","110°","70°"],"answer":"40°","hint":"三角形內角和 180°，扣掉兩個底角。","source":"新增試題十｜同概念變化題","paper":7,"concept":"三角形內角","visual":null},{"id":"T07_09","zone":"geometry","q":"一個正方形邊長 13 公分，放大成 4 倍後，面積是原來的幾倍？","choices":["4","8","20","16"],"answer":"16","hint":"面積倍率＝長度倍率的平方。","source":"新增試題十｜同概念變化題","paper":7,"concept":"面積倍率","visual":null},{"id":"T07_10","zone":"geometry","q":"一個 8 角柱有幾個面、幾條邊？","choices":["8面、16邊","10面、16邊","10面、24邊","9面、24邊"],"answer":"10面、24邊","hint":"n 角柱有 n+2 個面與 3n 條邊。","source":"新增試題十｜同概念變化題","paper":7,"concept":"角柱","visual":null},{"id":"T07_11","zone":"ratio","q":"一件裝備打 9 折後賣 1170 元，原價多少元？","choices":["1170","1400","1200","1300"],"answer":"1300","hint":"打折後價格÷折數對應的小數。","source":"新增試題十｜同概念變化題","paper":7,"concept":"百分率","visual":null},{"id":"T07_12","zone":"ratio","q":"104 顆寶石依 7：6 分成兩堆，較多的一堆有幾顆？","choices":["52","48","56","64"],"answer":"56","hint":"先求每一份，再乘較大的比例份數。","source":"新增試題十｜同概念變化題","paper":7,"concept":"比例分配","visual":null},{"id":"T07_13","zone":"ratio","q":"男生 12 人平均 27 公斤，女生 8 人平均 31 公斤，全班體重總和多少公斤？","choices":["541","572","599","540"],"answer":"572","hint":"人數乘平均值，再把兩組總和相加。","source":"新增試題十｜同概念變化題","paper":7,"concept":"加權平均","visual":null},{"id":"T07_14","zone":"ratio","q":"一箱餅乾先送出 2/5，剩下 30 片，原來有幾片？","choices":["40","30","50","60"],"answer":"50","hint":"剩下的分率是 (分母−分子)/分母。","source":"新增試題十｜同概念變化題","paper":7,"concept":"分數應用","visual":null},{"id":"T07_15","zone":"ratio","q":"地圖比例尺 1：20,000，圖上 9 公分，實際距離幾公尺？","choices":["1800","18000","180","1900"],"answer":"1800","hint":"圖上公分數乘比例尺分母，再除以 100 變成公尺。","source":"新增試題十｜同概念變化題","paper":7,"concept":"比例尺","visual":null},{"id":"T07_16","zone":"multiples","q":"84 與 24 的最大公因數是多少？","choices":["13","24","12","6"],"answer":"12","hint":"質因數分解或短除法。","source":"新增試題十｜同概念變化題","paper":7,"concept":"最大公因數","visual":null},{"id":"T07_17","zone":"multiples","q":"10 和 15 的最小公倍數是多少？","choices":["15","40","30","150"],"answer":"30","hint":"先求最大公因數，再用兩數相乘除以最大公因數。","source":"新增試題十｜同概念變化題","paper":7,"concept":"最小公倍數","visual":null},{"id":"T07_18","zone":"multiples","q":"三位數 63□ 同時是 2 和 3 的倍數，□ 可以填哪個數字？","choices":["3","5","6","1"],"answer":"6","hint":"個位要是偶數，且各位數字和能被 3 整除。","source":"新增試題十｜同概念變化題","paper":7,"concept":"整除判別","visual":null},{"id":"T07_19","zone":"multiples","q":"🔴、🟡、🟢、🔵、🟣 不斷循環，第 204 個是哪個？","choices":["🔵","🟢","🔴","🟡"],"answer":"🔵","hint":"以 5 為一輪，注意餘數 0 對應第 5 個。","source":"新增試題十｜同概念變化題","paper":7,"concept":"週期規律","visual":null},{"id":"T07_20","zone":"multiples","q":"寶石每 4 個或每 7 個分組都剩 2 個，不超過 183 顆時最多有幾顆？","choices":["170","142","168","198"],"answer":"170","hint":"扣掉餘數後，必須是兩數最小公倍數的倍數。","source":"新增試題十｜同概念變化題","paper":7,"concept":"同餘與公倍數","visual":null},{"id":"T07_21","zone":"speed","q":"巴士每 18 分鐘一班，首班 6:00，第 5 班是幾點？","choices":["7:30","7:48","7:12","6:54"],"answer":"7:12","hint":"第 n 班和第一班之間有 n−1 個間隔。","source":"新增試題十｜同概念變化題","paper":7,"concept":"班次間隔","visual":null},{"id":"T07_22","zone":"speed","q":"同一段路，去程每分鐘 40 公尺，回程每分鐘 60 公尺，往返平均速率每分鐘多少公尺？","choices":["40","60","50","48"],"answer":"48","hint":"同距離來回平均速率＝2ab/(a+b)。","source":"新增試題十｜同概念變化題","paper":7,"concept":"往返平均速率","visual":null},{"id":"T07_23","zone":"speed","q":"3 位同學 3 分鐘打掃 3 間教室；同樣人數、同樣速度，打掃 12 間需幾分鐘？","choices":["12","9","15","36"],"answer":"12","hint":"工作效率不變，教室數是幾倍，時間就幾倍。","source":"新增試題十｜同概念變化題","paper":7,"concept":"工作效率","visual":null},{"id":"T07_24","zone":"speed","q":"兩列火車長 80 與 80 公尺，迎面而行，第一列秒速 4 公尺，從相遇到完全錯開共 10 秒，第二列秒速多少公尺？","choices":["14","13","12","11"],"answer":"12","hint":"兩列車的長度和÷時間＝相對速度，再扣掉第一列速度。","source":"新增試題十｜同概念變化題","paper":7,"concept":"相向火車","visual":null},{"id":"T07_25","zone":"speed","q":"燈塔閃 6 下共花 25 秒，每次間隔相同，閃 11 下花幾秒？","choices":["51","50","55","45"],"answer":"50","hint":"閃 n 下只有 n−1 個間隔。","source":"新增試題十｜同概念變化題","paper":7,"concept":"時間間隔","visual":null},{"id":"T07_26","zone":"boss","q":"爸爸比孩子大 26 歲，6 年後爸爸年齡是孩子的 3 倍，爸爸今年幾歲？","choices":["33","7","39","36"],"answer":"33","hint":"設孩子今年 x 歲，年齡差固定。","source":"新增試題十｜同概念變化題","paper":7,"concept":"年齡倍數","visual":null},{"id":"T07_27","zone":"boss","q":"正方形廣場邊長 70 公尺，每隔 5 公尺沿封閉周界種一棵樹（四角都有），共種幾棵？","choices":["57","56","52","60"],"answer":"56","hint":"封閉路線棵數＝總周長÷間距，不要再加 1。","source":"新增試題十｜同概念變化題","paper":7,"concept":"封閉植樹","visual":null},{"id":"T07_28","zone":"boss","q":"魔法商店全館打 7 折，付了 84 金幣，原價多少金幣？","choices":["110","130","84","120"],"answer":"120","hint":"用實付價格除以折扣率。","source":"新增試題十｜同概念變化題","paper":7,"concept":"逆向百分率","visual":null},{"id":"T07_29","zone":"boss","q":"一列數字為 20、22、24……共 8 個，總和是多少？","choices":["224","214","218","216"],"answer":"216","hint":"等差數列總和＝（首項＋末項）×項數÷2。","source":"新增試題十｜同概念變化題","paper":7,"concept":"等差數列","visual":null},{"id":"T07_30","zone":"boss","q":"7 個連續整數總和為 189，最小的整數是多少？","choices":["24","23","27","25"],"answer":"24","hint":"奇數個連續整數的平均數就是中間那個數。","source":"新增試題十｜同概念變化題","paper":7,"concept":"連續整數","visual":null}];
+const ZONES = {"forest": {"label": "🌲 運算森林", "story": "算式、分數與未知數"}, "geometry": {"label": "🔺 幾何山谷", "story": "圖形、面積與角度"}, "ratio": {"label": "🗺️ 比例迷宮", "story": "比例、百分率與平均"}, "multiples": {"label": "🏰 倍數之塔", "story": "因倍數、週期與整數"}, "speed": {"label": "🚣 速率河流", "story": "時間、速率與間隔"}, "boss": {"label": "👑 Boss 神殿", "story": "綜合推理與壓軸挑戰"}};
+const ZONE_ORDER=["forest","geometry","ratio","multiples","speed","boss"];
+
+const SHOP=[
+ {id:"hat_cap",type:"hat",name:"藍色冒險帽",icon:"🧢",price:35},
+ {id:"hat_top",type:"hat",name:"魔術高帽",icon:"🎩",price:70},
+ {id:"hat_crown",type:"hat",name:"黃金王冠",icon:"👑",price:150},
+ {id:"hat_helmet",type:"hat",name:"勇者頭盔",icon:"⛑️",price:110},
+ {id:"outfit_blue",type:"outfit",name:"海洋外套",icon:"🌊",price:45,color:"#4777b8"},
+ {id:"outfit_knight",type:"outfit",name:"銀色鎧甲",icon:"⚔️",price:100,color:"#77848d"},
+ {id:"outfit_scholar",type:"outfit",name:"學者長袍",icon:"📚",price:75,color:"#6f5aa5"},
+ {id:"outfit_explorer",type:"outfit",name:"探險背心",icon:"🧭",price:85,color:"#9a6a3c"},
+ {id:"acc_bag",type:"acc",name:"冒險背包",icon:"🎒",price:40},
+ {id:"acc_shield",type:"acc",name:"守護盾牌",icon:"🛡️",price:65},
+ {id:"acc_sword",type:"acc",name:"勇者之劍",icon:"🗡️",price:90},
+ {id:"acc_wand",type:"acc",name:"數學魔杖",icon:"🪄",price:110}
+];
+const DEFAULTS={
+ coins:0,
+ owned:["hat_none","outfit_basic","acc_none"],
+ equipped:{hat:"hat_none",outfit:"outfit_basic",acc:"acc_none"},
+ inventory:{heartPotion:0,xpPotion:0,revive:0},
+ permanentHp:0,
+ totalXp:0,
+ wrong:{},
+ totalClears:0
+};
+const DEFAULT_ITEMS={
+ hat_none:{id:"hat_none",type:"hat",name:"不戴帽子",icon:"",price:0},
+ outfit_basic:{id:"outfit_basic",type:"outfit",name:"青綠冒險服",icon:"⭐",price:0,color:"#2f706e"},
+ acc_none:{id:"acc_none",type:"acc",name:"不拿配件",icon:"",price:0}
+};
+const ALL_ITEMS=[...Object.values(DEFAULT_ITEMS),...SHOP];
+const ITEM_BONUS={
+ hat_crown:{hp:1,text:"最大生命 +1"},hat_helmet:{hp:1,text:"最大生命 +1"},
+ outfit_knight:{hp:1,text:"最大生命 +1"},outfit_scholar:{xp:.10,text:"經驗值 +10%"},
+ outfit_explorer:{coin:.10,text:"金幣 +10%"},outfit_blue:{coin:.05,text:"金幣 +5%"},
+ acc_shield:{hp:1,text:"最大生命 +1"},acc_wand:{xp:.15,text:"經驗值 +15%"},
+ acc_sword:{coin:.10,text:"金幣 +10%"},acc_bag:{coin:.05,text:"金幣 +5%"}
+};
+const SUPPLIES=[
+ {id:"heartPotion",name:"補血藥水",icon:"❤️",price:20,desc:"冒險中使用，立刻恢復 2 點生命。"},
+ {id:"xpPotion",name:"經驗藥水",icon:"⭐",price:35,desc:"接下來 5 次答對，XP 再乘 1.5 倍。"},
+ {id:"revive",name:"復活羽毛",icon:"🪶",price:60,desc:"生命歸零時自動使用，恢復 2 點生命。"},
+ {id:"lifeCrystal",name:"生命水晶",icon:"💎",price:140,desc:"永久增加 1 點最大生命，最多使用 3 次。"}
+];
+
+let STORAGE_OK=true;
+const MEMSTORE={};
+function storageGet(k){
+ try{
+   const v=localStorage.getItem(k);
+   return v===null?(MEMSTORE[k]??null):v;
+ }catch(e){
+   STORAGE_OK=false;
+   return MEMSTORE[k]??null;
+ }
+}
+function storageSet(k,v){
+ MEMSTORE[k]=v;
+ try{localStorage.setItem(k,v);}
+ catch(e){STORAGE_OK=false;}
+}
+function load(k,fallback){
+ try{
+   const raw=storageGet(k);
+   const x=raw===null?null:JSON.parse(raw);
+   return x??JSON.parse(JSON.stringify(fallback));
+ }catch(e){
+   return JSON.parse(JSON.stringify(fallback));
+ }
+}
+function save(){
+ storageSet("bangbangProfileV2",JSON.stringify(profile));
+ storageSet("bangbangRunV2",JSON.stringify(run));
+}
+
+let profile=load("bangbangProfileV2",DEFAULTS);
+profile={...DEFAULTS,...profile,equipped:{...DEFAULTS.equipped,...(profile.equipped||{})},inventory:{...DEFAULTS.inventory,...(profile.inventory||{})},owned:Array.from(new Set(profile.owned||DEFAULTS.owned)),wrong:profile.wrong||{}};
+let run=load("bangbangRunV2",null);
+if(!run || !Array.isArray(run.order) || !run.order.length) run=newRunData();
+else {
+ if(!profile.totalXp && run.xp) profile.totalXp=run.xp;
+ run.xpBoost=run.xpBoost||0;
+ if(![6,7].includes(run.version) || !run.order?.[0]?.qdata){run=newRunData();}
+ run.life=Math.min(maxHp(),Math.max(0,run.life??maxHp()));
+}
+
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function sample(a,n){return shuffle(a).slice(0,n);}
+function equippedBonus(key){
+ let v=0;for(const id of Object.values(profile.equipped||{})){v+=(ITEM_BONUS[id]?.[key]||0);}return v;
+}
+function xpStartForLevel(level){let t=0;for(let l=1;l<level;l++)t+=100+(l-1)*25;return t;}
+function playerLevel(){let l=1;while(l<30 && profile.totalXp>=xpStartForLevel(l+1))l++;return l;}
+function levelInfo(){const l=playerLevel(),start=xpStartForLevel(l),need=l>=30?1:xpStartForLevel(l+1)-start,within=Math.max(0,profile.totalXp-start);return {level:l,start,need,within,pct:l>=30?100:Math.min(100,within/need*100)};}
+function maxHp(){const levelBonus=Math.min(2,Math.floor((playerLevel()-1)/4));return Math.min(10,5+levelBonus+(profile.permanentHp||0)+Math.round(equippedBonus("hp")));}
+function coinMultiplier(){return 1+equippedBonus("coin");}
+function xpMultiplier(){return 1+equippedBonus("xp")+(run&&run.xpBoost>0 ? .5 : 0);}
+function grantXp(base){
+ const before=playerLevel();const mult=1+equippedBonus("xp")+(run.xpBoost>0 ? .5 : 0);const gain=Math.max(1,Math.round(base*mult));
+ profile.totalXp+=gain;run.xp+=gain;if(run.xpBoost>0)run.xpBoost--;
+ const after=playerLevel();let levelMsg="";
+ if(after>before){const reward=(after-before)*25;profile.coins+=reward;run.life=maxHp();levelMsg=` 🎉 升到 Lv.${after}！生命全滿，🪙 +${reward}`;}
+ return {gain,levelMsg};
+}
+
+
+const STORY={
+ forest:[
+  {speaker:"米歐",portrait:"🧚",text:"小邦邦，歡迎來到運算森林！這裡的樹精最愛把算式藏在樹幹裡，你要用四則運算把道路打通。"},
+  {speaker:"小邦邦",portrait:"🧒",text:"只要我算得夠快，就能幫大家開路對吧？那就開始吧！"}
+ ],
+ geometry:[
+  {speaker:"幾何石像",portrait:"🗿",text:"想進入幾何山谷，先證明你看得懂角度、邊長和圖形規律。"},
+  {speaker:"米歐",portrait:"🧚",text:"別怕，小心觀察就好。圖形題不是硬背，而是看出關係。"}
+ ],
+ ratio:[
+  {speaker:"比例術士",portrait:"🧪",text:"比例迷宮會扭曲距離與大小。看懂百分率、單位和比例尺，才能找到真正的出口。"},
+  {speaker:"小邦邦",portrait:"🧒",text:"原來不是變難，而是換個方式問同一個概念！"}
+ ],
+ multiples:[
+  {speaker:"因數拼圖怪",portrait:"🧩",text:"倍數之塔只接受規律整齊的人。最大公因數、最小公倍數，缺一不可。"},
+  {speaker:"米歐",portrait:"🧚",text:"把題目拆成因數，就像拆開拼圖一樣。"}
+ ],
+ speed:[
+  {speaker:"疾風怪",portrait:"💨",text:"速率河流不等人！時間、路程、速率常常會互相偽裝，要冷靜分辨。"},
+  {speaker:"小邦邦",portrait:"🧒",text:"我會一步一步算，不會被題目騙走！"}
+ ],
+ boss:[
+  {speaker:"最終魔王",portrait:"👹",text:"你以為前面只是練習？現在，我要把所有題型混在一起，看你還能不能看出本質！"},
+  {speaker:"米歐",portrait:"🧚",text:"小邦邦，記得：情境會變，但數學概念不會變。這就是你最強的武器。"}
+ ],
+ zoneClear:{
+  forest:{speaker:"米歐",portrait:"🧚",text:"太好了！運算森林恢復平靜了。你已經越來越像真正的勇者。"},
+  geometry:{speaker:"幾何石像",portrait:"🗿",text:"你不只會算，還會看懂圖形。山谷之門為你開啟。"},
+  ratio:{speaker:"比例術士",portrait:"🧪",text:"能看透比例的人，不會被表面數字迷惑。你合格了。"},
+  multiples:{speaker:"因數拼圖怪",portrait:"🧩",text:"規律已被你掌握，倍數之塔承認你的實力。"},
+  speed:{speaker:"米歐",portrait:"🧚",text:"你追上了時間，也追上了自己。最後的神殿就在前方！"},
+  boss:{speaker:"小邦邦",portrait:"🧒",text:"太好了！原來真正的力量不是死背，而是看穿題目的核心概念！"}
+ },
+ ending:[
+  {speaker:"米歐",portrait:"🧚",text:"恭喜你，小邦邦！數學大陸恢復了平衡。今天打敗的不是怪物，而是『看起來很可怕的題目』。"},
+  {speaker:"小邦邦",portrait:"🧒",text:"下次我還要再挑戰！因為每次冒險，都會遇到新的變化題和新的自己。"}
+ ]
+};
+
+const ENEMIES={
+ forest:{emoji:["🌳","🍄","🐗","🪵"],name:["森林守衛","算式菇王","野豬算士","木樁怪"]},
+ geometry:{emoji:["🔺","🧊","📐","🗿"],name:["三角魔像","方塊獸","角度法師","幾何石像"]},
+ ratio:{emoji:["🧪","⚖️","🗺️","🥧"],name:["比例術士","天平怪","地圖精靈","百分率派王"]},
+ multiples:{emoji:["🔢","🕰️","🐉","🧩"],name:["倍數機兵","週期鐘獸","循環龍","因數拼圖怪"]},
+ speed:{emoji:["🚂","⏱️","🚣","💨"],name:["時間列車","秒針怪","速率船長","疾風怪"]},
+ boss:{emoji:["👹","🐲","🧙‍♂️","👾"],name:["最終魔王","數學巨龍","混合題大法師","題型吞噬者"]}
+};
+function enemyFor(zone,idx){
+ const e=ENEMIES[zone],n=(Math.floor(idx/5)+idx)%e.emoji.length;
+ return {emoji:e.emoji[n],name:e.name[n]};
+}
+function uniqChoices(ans,arr){
+ const out=[String(ans)];
+ for(const x of arr){const s=String(x);if(!out.includes(s))out.push(s);}
+ return out.slice(0,5);
+}
+function gcd(a,b){while(b){[a,b]=[b,a%b]}return Math.abs(a)}
+function lcm(a,b){return Math.abs(a*b)/gcd(a,b)}
+function fmtNum(x){return Number.isInteger(x)?String(x):String(Math.round(x*1000)/1000)}
+function minDivisorAbove(n,r){
+ let ds=[];for(let d=1;d<=n;d++)if(n%d===0&&d>r)ds.push(d);
+ return ds.length?Math.min(...ds):n;
+}
+function makeVariant(base){
+ const id=base.id, r=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+ let q=null;
+ if(id==="O01"){
+   const b=r(3,8),c=r(2,7),e=r(2,6),d=e*r(2,7),a=r(8,25),ans=a+b*c-d/e;
+   q={q:`${a} + ${b} × ${c} − ${d} ÷ ${e} = ?`,answer:fmtNum(ans),choices:uniqChoices(ans,[ans+2,ans-2,ans+b,ans+d/e]),hint:"先乘除、後加減；同一層級再由左到右。"};
+ }else if(id==="O03"){
+   const k=r(12,39),a=r(9,18),b=r(2,a-2),ans=k*(a-b);
+   q={q:`${k} × ${a} − ${k} × ${b} = ?`,answer:String(ans),choices:uniqChoices(ans,[k*(a+b),ans+k,ans-k,k*a]),hint:`把共同的 ${k} 提出來：${k}×(${a}−${b})。`};
+ }else if(id==="O05"){
+   const x=r(2,8),m=r(2,9)/10,basev=r(10,40)/10,total=Math.round((basev+m*x)*10)/10;
+   q={q:`${basev} + ${m} × □ = ${total}，□ 是多少？`,answer:String(x),choices:uniqChoices(x,[x-1,x+1,x+2,Math.max(1,x-2)]),hint:`先算 ${total}−${basev}，再除以 ${m}。`};
+ }else if(id==="O07"){
+   const bottom=[40,45,50,55,60,65][r(0,5)],ans=180-2*bottom;
+   q={q:`一個等腰三角形的兩個底角都是 ${bottom}°，頂角是多少？`,answer:`${ans}°`,choices:uniqChoices(`${ans}°`,[`${bottom}°`,`${180-bottom}°`,`${2*bottom}°`,`${90-bottom}°`]),hint:"等腰三角形兩個底角相等，三角形內角和是 180°。"};
+ }else if(id==="O09"){
+   const n=r(4,9),v=2*n,faces=n+2,edges=3*n,ans=`${faces}面${edges}邊`;
+   q={q:`某角柱共有 ${v} 個頂點，它有幾個面、幾條邊？`,answer:ans,choices:uniqChoices(ans,[`${n}面${2*n}邊`,`${faces}面${2*n}邊`,`${n+3}面${edges}邊`,`${faces+2}面${edges+2}邊`]),hint:"n 角柱：頂點 2n、邊 3n、面 n+2。"};
+ }else if(id==="O10"){
+   const f=[1.2,1.5,2,2.5][r(0,3)],ans=Math.round(f*f*100)/100;
+   q={q:`正方形邊長變成原來的 ${f} 倍，面積變成幾倍？`,answer:String(ans),choices:uniqChoices(ans,[f,2*f,ans+1,Math.max(.5,ans-1)]),hint:"面積的倍率＝邊長倍率的平方。"};
+ }else if(id==="O11"){
+   const n=[0.025,0.045,0.075,0.12,0.18][r(0,4)],ans=`${n*100}%`;
+   q={q:`${n} 用百分率表示是多少？`,answer:ans,choices:uniqChoices(ans,[`${n}%`,`${n*10}%`,`${n*1000}%`,`${n*10000}%`]),hint:"小數化百分率要乘以 100。"};
+ }else if(id==="O13"){
+   const g=[45,80,125,250,375,650][r(0,5)],ans=g/1000;
+   q={q:`${g} 公克等於多少公斤？`,answer:String(ans),choices:uniqChoices(ans,[g/100,g/10,g*0.001+0.1,g]),hint:"1000 公克＝1 公斤。"};
+ }else if(id==="O14"){
+   const den=[10000,25000,50000,100000][r(0,3)],cm=r(2,8),km=cm*den/100000;
+   const ans=km>=1?`${fmtNum(km)} 公里`:`${fmtNum(km*1000)} 公尺`;
+   q={q:`比例尺 1：${den.toLocaleString("en-US")}，地圖上 ${cm} 公分，實際距離是多少？`,answer:ans,choices:uniqChoices(ans,[`${fmtNum(km*10)} 公里`,`${fmtNum(km/10)} 公里`,`${fmtNum(km*100)} 公尺`,`${fmtNum(cm*den/1000)} 公尺`]),hint:"先用圖上距離×比例尺分母，再把公分換成公尺或公里。"};
+ }else if(id==="O18"){
+   const pairs=[[6,8],[8,12],[9,12],[10,15]][r(0,3)],L=lcm(...pairs),count=r(5,9),limit=L*count+r(0,L-1),ans=Math.floor(limit/L);
+   q={q:`1 到 ${limit} 的正整數中，${pairs[0]} 和 ${pairs[1]} 的公倍數共有幾個？`,answer:String(ans),choices:uniqChoices(ans,[ans-1,ans+1,ans+2,Math.max(1,ans-2)]),hint:`先求 ${pairs[0]} 和 ${pairs[1]} 的最小公倍數，再看上限裡有幾個。`};
+ }else if(id==="O21"){
+   const interval=[12,15,18,20][r(0,3)],nth=r(5,8),hour=r(6,9),min=[0,5,10,20,30][r(0,4)],total=hour*60+min+(nth-1)*interval,hh=Math.floor(total/60),mm=total%60,ans=`${hh}:${String(mm).padStart(2,"0")}`;
+   q={q:`公車每 ${interval} 分鐘一班，第一班 ${hour}:${String(min).padStart(2,"0")} 發車，第 ${nth} 班幾點發車？`,answer:ans,choices:uniqChoices(ans,[`${Math.floor((total-interval)/60)}:${String((total-interval)%60).padStart(2,"0")}`,`${Math.floor((total+interval)/60)}:${String((total+interval)%60).padStart(2,"0")}`,`${hh}:${String((mm+5)%60).padStart(2,"0")}`,`${hh}:${String((mm+10)%60).padStart(2,"0")}`]),hint:`第 1 班到第 ${nth} 班只有 ${nth-1} 個間隔。`};
+ }else if(id==="O22"){
+   const m=[4,5,6][r(0,2)],secPer=r(35,70),n=m*r(3,6),total=secPer*n,mi=Math.floor(total/60),se=total%60,ans=`${mi}分${se}秒`;
+   q={q:`做 ${m} 題需要 ${Math.floor(secPer*m/60)}分${(secPer*m)%60}秒，以相同速度完成 ${n} 題需要多久？`,answer:ans,choices:uniqChoices(ans,[`${mi+1}分${se}秒`,`${Math.max(0,mi-1)}分${se}秒`,`${mi}分${(se+10)%60}秒`,`${mi+2}分${se}秒`]),hint:`${n} 題是 ${m} 題的 ${n/m} 倍，所以時間也乘同樣倍數。`};
+ }else if(id==="O25"){
+   const speed=340,time=[1,1.2,1.5,2][r(0,3)],d=speed*time/2,ans="340 公尺/秒";
+   q={q:`小邦邦距離山壁 ${fmtNum(d)} 公尺，大喊後 ${time} 秒聽見回聲，聲速約多少？`,answer:ans,choices:uniqChoices(ans,["170 公尺/秒",`${fmtNum(d/time)} 公尺/秒`,`${fmtNum(d)} 公尺/秒`,"680 公尺/秒"]),hint:"回聲是來回路程，所以聲音走的距離是「到山壁距離×2」。"};
+ }else if(id==="O26"){
+   const rate=[0.75,0.8,0.85,0.9][r(0,3)],original=r(6,16)*100,sale=original*rate,ans=String(original);
+   q={q:`一件裝備打 ${rate*10} 折後售價 ${sale} 元，原價是多少？`,answer:ans,choices:uniqChoices(ans,[sale,original-100,original+100,Math.round(sale/rate/10)*10+200]),hint:`原價 × ${rate} = ${sale}。`};
+ }else if(id==="O28"){
+   const rmd=r(3,12),base=[48,60,72,84,90,120][r(0,5)],cap=minDivisorAbove(base,rmd),total=base+rmd,ans=String(cap);
+   q={q:`有 ${total} 顆寶石，每盒裝相同數量，最後剩 ${rmd} 顆不足以再裝一盒。每盒最少可能裝幾顆？`,answer:ans,choices:uniqChoices(ans,[rmd+1,cap+2,base,Math.max(rmd+2,cap-2)]),hint:`先算 ${total}−${rmd}=${base}；盒容量要是 ${base} 的因數，而且必須大於 ${rmd}。`};
+ }else if(id==="O29"){
+   const syms=["○","△","□","★","◇"],n=r(41,299),ans=syms[(n-1)%5];
+   q={q:`○、△、□、★、◇ 不斷循環，第 ${n} 個圖形是？`,answer:ans,choices:shuffle(syms).slice(0,4),hint:`每 5 個一循環，用 ${n} ÷ 5 的餘數判斷。`};
+   if(!q.choices.includes(ans))q.choices[0]=ans;
+ }else if(id==="N06"){
+   const first=r(3,5),interval=r(2,5),time=(first-1)*interval,target=r(6,9),ans=(target-1)*interval;
+   q={q:`閃光裝置閃 ${first} 下共花 ${time} 秒。若每次閃光間隔相同，閃 ${target} 下需要多少秒？`,answer:String(ans),choices:uniqChoices(ans,[target*interval,(target-2)*interval,ans+interval,ans-interval]),hint:`${first} 下只有 ${first-1} 個間隔；${target} 下有 ${target-1} 個間隔。`};
+ }else if(id==="N10"){
+   const den=[5,7,8,9][r(0,3)],num=r(2,den-2),remain=den-num,unit=r(5,12),second=remain*unit,first=num*unit,diff=Math.abs(first-second);
+   q={q:`小邦邦拿走一箱卡片的 ${num}/${den}，剩下全部給朋友。朋友得到 ${second} 張，小邦邦比朋友${first>=second?"多":"少"}幾張？`,answer:String(diff),choices:uniqChoices(diff,[diff+unit,Math.max(1,diff-unit),first,second]),hint:`朋友拿到 ${remain}/${den}，先由 ${remain}/${den}=${second} 求出每 ${1}/${den} 有幾張。`};
+ }else if(id==="N12"){
+   const inserts=[3,4,5][r(0,2)],step=r(2,6),start=r(1,8),end=start+step*(inserts+1),seq=Array.from({length:inserts},(_,i)=>start+step*(i+1)),ans=seq.reduce((a,b)=>a+b,0);
+   q={q:`在 ${start} 與 ${end} 之間放入 ${inserts} 個數，使所有相鄰兩數的差都相同，這 ${inserts} 個數的總和是多少？`,answer:String(ans),choices:uniqChoices(ans,[ans+step,ans-step,ans+start,ans+end]),hint:`連同兩端共有 ${inserts+2} 個等差數，先求每一段的公差。`};
+ }else if(id==="N13"){
+   const nums=[[3,4,5],[3,5,7],[4,6,9]][r(0,2)],rem=r(1,3),L=nums.reduce((a,b)=>lcm(a,b)),limit=L*r(3,6)+r(0,L-1),ans=Math.floor((limit-rem)/L)*L+rem;
+   q={q:`糖果每 ${nums.join("、")} 個一數都剩 ${rem} 個，若總數不超過 ${limit}，最多有幾個？`,answer:String(ans),choices:uniqChoices(ans,[ans-rem,ans+rem,ans-L,Math.min(limit,ans+L)]),hint:`總數減 ${rem} 後，必須是 ${nums.join("、")} 的公倍數。`};
+ }else if(id==="N19"){
+   const totalN=[30,36,40][r(0,2)],boys=totalN/2,bavg=r(28,34),gavg=r(25,31),overall=(boys*bavg+(totalN-boys)*gavg)/totalN,ans=String(gavg);
+   q={q:`全班 ${totalN} 人平均體重 ${overall}kg，其中男生 ${boys} 人平均 ${bavg}kg，女生平均體重是多少？`,answer:ans,choices:uniqChoices(ans,[gavg-1,gavg+.5,gavg+1,bavg]),hint:"先求全班總重量，再扣掉男生總重量，最後除以女生人數。"};
+ }else if(id==="N21"){
+   const count=[5,7,9][r(0,2)],middle=r(20,50),sum=count*middle,min=middle-Math.floor(count/2),ans=String(min);
+   q={q:`${count} 個連續整數的總和是 ${sum}，最小的數是多少？`,answer:ans,choices:uniqChoices(ans,[min-1,min+1,middle,middle-1]),hint:`連續奇數個整數的平均數就是正中間那個數：${sum}÷${count}。`};
+ }else if(id==="N22"){
+   const n=r(8,18),ans=n*(n-3)/2;
+   q={q:`正 ${n} 邊形共有多少條對角線？`,answer:String(ans),choices:uniqChoices(ans,[n*(n-2)/2,n*(n-3),ans+n,Math.max(1,ans-n)]),hint:"n 邊形對角線數＝n(n−3)÷2。"};
+ }else if(id==="N24"){
+   const b=[12,15,18,21,24,30][r(0,5)],a=b*r(3,8),c=b*r(2,7),ans=gcd(a,c);
+   q={q:`三個整數 a、b、c 滿足 a×b=${a}、b×c=${c}，其中 b 最大可能是多少？`,answer:String(ans),choices:uniqChoices(ans,[b,ans*2,Math.max(1,ans/2),a]),hint:`b 必須同時整除 ${a} 與 ${c}，所以找兩數的最大公因數。`};
+ }else if(id==="N28"){
+   const pct=[40,50,60,75][r(0,3)],total=[200,240,280,300][r(0,3)],known=total*pct/100,target=[total/4,total/5,total/2][r(0,2)],angle=target/total*360,ans=`${angle}°`;
+   q={q:`圓形百分率圖中，${pct}% 表示 ${known} 人。那麼 ${target} 人應用多少度的圓心角表示？`,answer:ans,choices:uniqChoices(ans,[`${angle/2}°`,`${angle+30}°`,`${Math.max(30,angle-30)}°`,`${360-angle}°`]),hint:`先由 ${known}÷${pct}% 求總人數，再算 ${target} 人占總數的比例×360°。`};
+ }
+ if(!q)return {...base};
+ return {...base,...q,source:"🎲 同概念變化題",variantOf:base.id,visual:null};
+}
+function maybeVariant(q){
+ const can=["O01","O03","O05","O07","O09","O10","O11","O13","O14","O18","O21","O22","O25","O26","O28","O29","N06","N10","N12","N13","N19","N21","N22","N24","N28"];
+ return can.includes(q.id) && Math.random()<0.78 ? makeVariant(q) : {...q};
+}
+
+function newRunData(){
+ const order=[];
+ for(const z of ZONE_ORDER){
+   const pool=QUESTIONS.filter(q=>q.zone===z);
+   const fresh=pool.filter(q=>q.id.startsWith("T"));
+   const sprint=pool.filter(q=>q.id.startsWith("N"));
+   const classic=pool.filter(q=>q.id.startsWith("O"));
+   let pick=[...sample(fresh,3),...sample(sprint,1),...sample(classic,1)];
+   if(pick.length<5){const used=new Set(pick.map(x=>x.id));pick.push(...sample(pool.filter(x=>!used.has(x.id)),5-pick.length));}
+   pick=shuffle(pick).map(base=>{const q=maybeVariant(base);return {id:base.id,qdata:q,choices:shuffle(q.choices)}});
+   order.push(...pick);
+ }
+ return {version:7,order,index:0,xp:0,streak:0,life:maxHp(),xpBoost:0,comboRewarded:false,wrongIds:[],zoneMistakes:{},zoneRewards:[],attempts:0,answered:false,correct:false,disabled:[],finished:false,storyFlags:{},pendingDialogue:null,endingSeen:false};
+}
+function qNow(){const ref=run.order[run.index];return ref.qdata||QUESTIONS.find(q=>q.id===ref.id)}
+function item(id){return ALL_ITEMS.find(x=>x.id===id)||DEFAULT_ITEMS.outfit_basic}
+function heroRank(){const l=playerLevel();if(l>=20)return "傳說數學勇者";if(l>=15)return "Boss 獵人";if(l>=10)return "數學勇者";if(l>=5)return "見習數學騎士";return "數學冒險學徒";}
+function avatarHTML(big=false){
+ const h=item(profile.equipped.hat),o=item(profile.equipped.outfit),a=item(profile.equipped.acc);
+ const fill=o.color||"#2f706e";
+ return `<div class="avatar refined-avatar">
+   <div class="hat">${h.icon||""}</div>
+   <svg viewBox="0 0 190 210" aria-label="小邦邦勇者角色">
+    <defs>
+      <linearGradient id="capeGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${fill}"/>
+        <stop offset="100%" stop-color="#1f465f"/>
+      </linearGradient>
+      <linearGradient id="coatLight" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity=".35"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="M42 110 Q95 90 148 110 L160 185 Q126 201 95 201 Q64 201 30 185 Z" fill="url(#capeGrad)" opacity=".22"/>
+    <ellipse cx="95" cy="52" rx="33" ry="36" fill="#f0c7a2"/>
+    <path d="M61 50 Q64 16 98 16 Q126 16 129 47 Q117 37 102 35 Q84 32 68 40 Q63 45 61 50" fill="#5a4336"/>
+    <path d="M63 56 Q71 33 92 31 Q112 28 127 43 Q125 59 114 67 Q103 53 84 53 Q74 53 63 56" fill="#6a5143"/>
+    <ellipse cx="64" cy="59" rx="5" ry="8" fill="#efc4a0"/>
+    <ellipse cx="126" cy="59" rx="5" ry="8" fill="#efc4a0"/>
+    <ellipse cx="83" cy="58" rx="4.3" ry="5.2" fill="#17324d"/>
+    <ellipse cx="107" cy="58" rx="4.3" ry="5.2" fill="#17324d"/>
+    <circle cx="84" cy="56" r="1.3" fill="#fff"/>
+    <circle cx="108" cy="56" r="1.3" fill="#fff"/>
+    <path d="M76 49 Q83 46 89 49" stroke="#553c31" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M101 49 Q107 46 114 49" stroke="#553c31" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M95 60 Q92 68 96 71" stroke="#d9ab88" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M84 78 Q95 85 107 78" stroke="#9f5d57" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="87" y="81" width="16" height="13" rx="6" fill="#efc4a0"/>
+    <path d="M58 104 Q95 85 132 104 L145 175 Q119 190 95 190 Q71 190 45 175 Z" fill="${fill}" stroke="#17324d" stroke-width="2.8"/>
+    <path d="M76 101 L92 175" stroke="#f6f5f2" stroke-width="8" stroke-linecap="round"/>
+    <path d="M114 101 L98 175" stroke="#f6f5f2" stroke-width="8" stroke-linecap="round"/>
+    <path d="M87 101 L95 117 L103 101 Z" fill="#f8f8f8"/>
+    <path d="M95 117 L100 150 L95 162 L90 150 Z" fill="#d88a2d"/>
+    <rect x="62" y="148" width="66" height="8" rx="4" fill="#69452f" opacity=".5"/>
+    <circle cx="95" cy="127" r="2.6" fill="#d6d9df"/>
+    <circle cx="95" cy="138" r="2.6" fill="#d6d9df"/>
+    <path d="M58 108 Q42 122 34 146" stroke="#efc4a0" stroke-width="12" stroke-linecap="round" fill="none"/>
+    <path d="M132 108 Q148 120 156 144" stroke="#efc4a0" stroke-width="12" stroke-linecap="round" fill="none"/>
+    <path d="M60 108 Q49 116 41 130" stroke="${fill}" stroke-width="16" stroke-linecap="round" fill="none"/>
+    <path d="M130 108 Q143 116 151 129" stroke="${fill}" stroke-width="16" stroke-linecap="round" fill="none"/>
+    <path d="M78 176 L73 202" stroke="#314a63" stroke-width="12" stroke-linecap="round"/>
+    <path d="M112 176 L117 202" stroke="#314a63" stroke-width="12" stroke-linecap="round"/>
+    <ellipse cx="70" cy="204" rx="11" ry="5" fill="#40322b"/>
+    <ellipse cx="120" cy="204" rx="11" ry="5" fill="#40322b"/>
+   </svg>
+   <div class="chest">${o.icon||""}</div><div class="acc">${a.icon||""}</div>
+  </div>`;
+}
+
+
+function dialogueShown(key){return !!run.storyFlags?.[key]}
+function markDialogue(key){run.storyFlags=run.storyFlags||{};run.storyFlags[key]=true;}
+function openDialogue(lines,key,extraClass=""){
+ if(!lines||!lines.length)return false;
+ run.pendingDialogue={lines,idx:0,key,extraClass};
+ const box=document.getElementById("dialogueBox");
+ box.className="dialogue-box "+extraClass;
+ box.style.display="flex";
+ ["question","visual","choices","feedback","hint"].forEach(id=>{
+   const el=document.getElementById(id); if(el) el.style.display="none";
+ });
+ const actions=document.querySelector("#gameCard .actions"); if(actions) actions.style.display="none";
+ const supplies=document.querySelector("#gameCard .supply-bar"); if(supplies) supplies.style.display="none";
+ showDialogueLine();
+ return true;
+}
+function showDialogueLine(){
+ const d=run.pendingDialogue;if(!d)return;
+ const line=d.lines[d.idx];
+ document.getElementById("dialoguePortrait").textContent=line.portrait||"🧚";
+ document.getElementById("dialogueSpeaker").textContent=line.speaker||"旁白";
+ document.getElementById("dialogueText").textContent=line.text||"";
+ document.getElementById("dialogueNext").textContent=d.idx>=d.lines.length-1?"開始挑戰":"下一句";
+ document.getElementById("gameCard").style.display="block";
+}
+function closeDialogue(){
+ document.getElementById("dialogueBox").style.display="none";
+ if(run.pendingDialogue?.key)markDialogue(run.pendingDialogue.key);
+ run.pendingDialogue=null;
+ ["question","visual","choices","feedback"].forEach(id=>{
+   const el=document.getElementById(id); if(el) el.style.display="";
+ });
+ const hint=document.getElementById("hint"); if(hint) hint.style.display="none";
+ const actions=document.querySelector("#gameCard .actions"); if(actions) actions.style.display="";
+ const supplies=document.querySelector("#gameCard .supply-bar"); if(supplies) supplies.style.display="";
+ save();
+ renderGame();
+}
+function maybeOpenStory(){
+ const q=qNow();
+ const zoneStartKey=`start_${q.zone}`;
+ if(run.index%5===0 && !dialogueShown(zoneStartKey)){
+   return openDialogue(STORY[q.zone], zoneStartKey);
+ }
+ return false;
+}
+
+function renderAvatar(){
+ document.getElementById("avatarTop").innerHTML=avatarHTML();
+ document.getElementById("avatarBig").innerHTML=avatarHTML(true);
+ document.getElementById("heroTitle").textContent=heroRank();
+ document.getElementById("wardrobeTitle").textContent=heroRank();
+}
+function updateWallet(){
+ document.getElementById("coinTop").textContent=profile.coins;
+ document.getElementById("coinShop").textContent=profile.coins;
+}
+function renderMap(){
+ const map=document.getElementById("map");map.innerHTML="";
+ const currentZone=Math.min(5,Math.floor(run.index/5));
+ ZONE_ORDER.forEach((z,i)=>{
+   const d=document.createElement("div");d.className="node"+(i<currentZone?" done":"")+(i===currentZone&&!run.finished?" active":"");
+   d.innerHTML=`<div class="ico">${ZONES[z].label.split(" ")[0]}</div><b>${ZONES[z].label.replace(/^[^ ]+ /,"")}</b><div>${i<currentZone?"✅ 已通關":i===currentZone?"挑戰中":"🔒 待解鎖"}</div>`;
+   map.appendChild(d);
+ });
+}
+function visualHTML(type){
+ if(!type)return "";
+ if(type==="triangleRatio") return `<svg viewBox="0 0 500 190"><path d="M35 160 L250 25 L465 160 Z" fill="#f7f3ea" stroke="#17324d" stroke-width="3"/><line x1="250" y1="25" x2="280" y2="160" stroke="#17324d" stroke-width="3"/><text x="140" y="180" font-size="24">9</text><text x="365" y="180" font-size="24">7</text></svg>`;
+ if(type==="matchsticks") return `<svg viewBox="0 0 560 170"><g stroke="#694f32" stroke-width="8" stroke-linecap="round">
+  <line x1="30" y1="125" x2="90" y2="45"/><line x1="90" y1="45" x2="190" y2="45"/><line x1="30" y1="125" x2="130" y2="125"/><line x1="190" y1="45" x2="130" y2="125"/>
+  <line x1="190" y1="45" x2="290" y2="45"/><line x1="130" y1="125" x2="230" y2="125"/><line x1="290" y1="45" x2="230" y2="125"/>
+  <line x1="290" y1="45" x2="390" y2="45"/><line x1="230" y1="125" x2="330" y2="125"/><line x1="390" y1="45" x2="330" y2="125"/>
+  </g><text x="420" y="92" font-size="30">……</text></svg>`;
+ if(type==="cubeNets") return cubeNetsSVG();
+ if(type==="shadedArea") return `<svg viewBox="0 0 480 330">
+  <defs><pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" y1="0" x2="0" y2="10" stroke="#7c8790" stroke-width="3"/></pattern></defs>
+  <path d="M70 45 H290 L390 145 V285 H70 Z" fill="url(#hatch)" stroke="#17324d" stroke-width="3"/>
+  <rect x="198" y="45" width="14" height="240" fill="#fffdf8"/><rect x="70" y="177" width="320" height="14" fill="#fffdf8"/>
+  <text x="165" y="31" font-size="22">40</text><text x="27" y="170" font-size="22">50</text><text x="402" y="220" font-size="22">30</text><text x="215" y="315" font-size="22">60</text>
+  <text x="216" y="110" font-size="18">2</text><text x="112" y="171" font-size="18">2</text></svg>`;
+ if(type==="setSquares") return `<svg viewBox="0 0 560 390">
+  <g fill="none" stroke="#17324d" stroke-width="3">
+   <path d="M75 115 L75 330 L450 115 Z"/><path d="M75 115 L330 50 L410 325 Z"/><line x1="75" y1="115" x2="450" y2="115"/>
+  </g>
+  <text x="51" y="109" font-size="22">B</text><text x="458" y="120" font-size="22">C</text><text x="265" y="226" font-size="22">A</text><text x="383" y="222" font-size="22">X</text>
+  <text x="83" y="311" font-size="21">60°</text>
+  <path d="M76 116 h22 v22 h-22" fill="none" stroke="#17324d" stroke-width="2"/>
+  <path d="M315 54 l20 5 l-5 20 l-20-5" fill="none" stroke="#17324d" stroke-width="2"/>
+  <circle cx="383" cy="198" r="4" fill="#d88a2d"/>
+  </svg>`;
+ return "";
+}
+function cubeNetsSVG(){
+ const shapes=[
+ [[0,1],[1,1],[2,1],[1,0],[2,2],[3,2]],
+ [[0,1],[1,1],[2,1],[0,0],[2,2],[3,2]],
+ [[0,0],[1,0],[2,0],[2,1],[2,2],[3,2]],
+ [[0,0],[0,1],[1,1],[2,1],[3,1],[2,2]]
+ ];
+ let s=`<svg viewBox="0 0 640 250">`;
+ shapes.forEach((cells,k)=>{const ox=18+k*155,oy=28;cells.forEach(([x,y])=>{s+=`<rect x="${ox+x*31}" y="${oy+y*31}" width="31" height="31" fill="#fffdf8" stroke="#17324d" stroke-width="2"/>`;});s+=`<text x="${ox+48}" y="225" font-size="20">圖 ${k+1}</text>`;});
+ return s+`</svg>`;
+}
+
+function renderGame(){
+ renderAvatar();updateWallet();renderMap();
+ if(run.finished){showResult();return}
+ document.getElementById("gameCard").style.display="block";document.getElementById("resultCard").style.display="none";
+ const q=qNow(),ref=run.order[run.index],zoneIndex=Math.floor(run.index/5);
+ document.getElementById("levelText").textContent=`${run.index+1} / 30`;
+ const li=levelInfo();
+ document.getElementById("playerLevel").textContent=`Lv.${li.level}`;
+ document.getElementById("xpText").textContent=li.level>=30?"MAX":`${li.within} / ${li.need}`;
+ document.getElementById("levelLeft").textContent=`Lv.${li.level}`;document.getElementById("levelRight").textContent=li.level>=30?"MAX":`Lv.${li.level+1}`;
+ document.getElementById("levelProgressBar").style.width=`${li.pct}%`;
+ document.getElementById("streakPill").textContent=`🔥 ${run.streak} 連勝`;
+ run.life=Math.min(run.life,maxHp());document.getElementById("heartText").textContent=`❤️ ${run.life} / ${maxHp()}`;
+ document.getElementById("progressBar").style.width=`${run.index/30*100}%`;
+ renderSupplyBar();
+ document.getElementById("zoneBadge").textContent=ZONES[q.zone].label;
+ document.getElementById("source").textContent=q.source==="衝刺班題型"?"✨ 新增衝刺班題型":"經典題型";
+ document.getElementById("question").textContent=q.q;
+ document.getElementById("visual").innerHTML=visualHTML(q.visual);
+ document.body.dataset.zone=q.zone;
+ const foe=enemyFor(q.zone,run.index);
+ document.getElementById("enemyEmoji").textContent=foe.emoji;
+ document.getElementById("enemyName").textContent=foe.name;
+ document.getElementById("battleAvatar").innerHTML=avatarHTML();
+ const zoneStep=run.index%5;
+ document.getElementById("enemyHp").style.width=`${Math.max(20,(5-zoneStep)*20)}%`;
+ document.getElementById("heroBattleHp").style.width=`${Math.max(0,run.life/maxHp()*100)}%`;
+ document.getElementById("missionChip").textContent=run.comboRewarded?"✅ 三連勝任務完成":`🎯 任務：${Math.min(3,run.streak)}/3 連勝`;
+ document.getElementById("source").textContent=q.source.includes("變化題")?"🎲 同概念變化題":(q.source==="衝刺班題型"?"✨ 衝刺概念":"經典概念");
+ const boss=document.getElementById("bossPanel");
+ if(q.zone==="boss"){boss.style.display="block";const bossStep=run.index-25;document.getElementById("bossHp").style.width=`${Math.max(0,(5-bossStep)*20)}%`;} else boss.style.display="none";
+ const box=document.getElementById("choices");box.innerHTML="";
+ ref.choices.forEach((c,idx)=>{
+  const b=document.createElement("button");b.type="button";b.className="choice";b.textContent=String.fromCharCode(65+idx)+". "+c;
+  if(run.disabled.includes(c)){b.disabled=true;b.classList.add("wrong")}
+  if(run.answered){
+    b.disabled=true;
+    if(c===q.answer)b.classList.add("correct");
+  } else b.addEventListener("click",()=>answer(c,b));
+  box.appendChild(b);
+ });
+ document.getElementById("feedback").textContent=run.answered?(run.correct?"✅ 已答對，可以前往下一關。":"🛡️ 這題先記進錯題本，下一關再戰！"):"";
+ document.getElementById("hint").style.display="none";
+ document.getElementById("nextBtn").disabled=!run.answered;
+ if(run.pendingDialogue){showDialogueLine();}
+ else{maybeOpenStory();}
+ save();
+}
+function answer(choice,button){
+ if(run.answered)return;
+ const q=qNow();run.attempts++;
+ if(choice===q.answer){
+   run.answered=true;run.correct=true;run.streak++;
+   const rawCoin=run.attempts===1?5:3,coinGain=Math.max(1,Math.round(rawCoin*coinMultiplier()));
+   profile.coins+=coinGain;
+   let comboBonus=0,comboText="";
+   if(run.streak>=3 && !run.comboRewarded){run.comboRewarded=true;comboBonus=20;profile.coins+=comboBonus;comboText=" 🎯 三連勝任務！🪙 +20";}
+   const xpBase=run.streak>=3?15:10,xpResult=grantXp(xpBase);
+   button.classList.add("correct");
+   document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+   const enemy=document.getElementById("enemyFighter");enemy.classList.remove("hit");void enemy.offsetWidth;enemy.classList.add("hit");
+   const fr=document.getElementById("floatReward");fr.textContent=`+${xpResult.gain} XP  +${coinGain+comboBonus} 🪙`;fr.classList.remove("show");void fr.offsetWidth;fr.classList.add("show");
+   document.getElementById("enemyHp").style.width=`${Math.max(0,(4-(run.index%5))*20)}%`;
+   document.getElementById("feedback").textContent=`⚔️ 命中！+${xpResult.gain} XP、🪙 +${coinGain}${comboText}${xpResult.levelMsg}`;
+   document.getElementById("hint").innerHTML=`<b>解法：</b>${q.hint}`;
+   document.getElementById("hint").style.display="block";
+   document.getElementById("nextBtn").disabled=false;
+ }else{
+   button.classList.add("wrong");button.disabled=true;run.disabled.push(choice);run.life=Math.max(0,run.life-1);run.streak=0;
+   const hero=document.querySelector(".hero-fighter");hero.classList.remove("hurt");void hero.offsetWidth;hero.classList.add("hurt");
+   document.getElementById("heroBattleHp").style.width=`${Math.max(0,run.life/maxHp()*100)}%`;
+   run.zoneMistakes[q.zone]=(run.zoneMistakes[q.zone]||0)+1;
+   if(!run.wrongIds.includes(q.id))run.wrongIds.push(q.id);
+   profile.wrong[q.id]=(profile.wrong[q.id]||0)+1;
+   if(run.life===0 && (profile.inventory.revive||0)>0){
+     profile.inventory.revive--;run.life=Math.min(2,maxHp());
+     document.getElementById("feedback").textContent="🪶 復活羽毛自動發動！恢復 2 點生命，再試一次！";
+   }else{
+     document.getElementById("feedback").textContent="❌ 扣 1 點生命。再想一次！";
+     if(run.life===0){run.answered=true;run.correct=false;document.querySelectorAll(".choice").forEach(b=>b.disabled=true);document.getElementById("feedback").textContent="💤 生命值用完了，先休息一下。這題已加入錯題本。";document.getElementById("hint").textContent="提示："+q.hint;document.getElementById("hint").style.display="block";document.getElementById("nextBtn").disabled=false;}
+   }
+ }
+ save();renderAvatar();updateWallet();renderRpgStats();renderSupplyBar();
+}
+function renderRpgStats(){
+ const li=levelInfo();document.getElementById("playerLevel").textContent=`Lv.${li.level}`;document.getElementById("xpText").textContent=li.level>=30?"MAX":`${li.within} / ${li.need}`;document.getElementById("levelLeft").textContent=`Lv.${li.level}`;document.getElementById("levelRight").textContent=li.level>=30?"MAX":`Lv.${li.level+1}`;document.getElementById("levelProgressBar").style.width=`${li.pct}%`;document.getElementById("streakPill").textContent=`🔥 ${run.streak} 連勝`;document.getElementById("heartText").textContent=`❤️ ${run.life} / ${maxHp()}`;
+}
+function renderSupplyBar(){
+ const inv=profile.inventory||{};document.getElementById("heartPotionCount").textContent=inv.heartPotion||0;document.getElementById("xpPotionCount").textContent=inv.xpPotion||0;document.getElementById("reviveCount").textContent=inv.revive||0;
+ const hb=document.getElementById("heartPotionBtn"),xb=document.getElementById("xpPotionBtn");hb.disabled=(inv.heartPotion||0)<=0||run.life>=maxHp()||run.finished;xb.disabled=(inv.xpPotion||0)<=0||run.finished;
+ const note=document.getElementById("xpBoostText");if(run.xpBoost>0){note.style.display="block";note.textContent=`⭐ 經驗加成生效中：接下來 ${run.xpBoost} 次答對，XP ×1.5`;}else note.style.display="none";
+}
+function useHeartPotion(){if((profile.inventory.heartPotion||0)<=0||run.life>=maxHp())return;profile.inventory.heartPotion--;run.life=Math.min(maxHp(),run.life+2);document.getElementById("feedback").textContent="❤️ 使用補血藥水，恢復生命！";save();renderSupplyBar();renderRpgStats();}
+function useXpPotion(){if((profile.inventory.xpPotion||0)<=0)return;profile.inventory.xpPotion--;run.xpBoost=Math.min(10,(run.xpBoost||0)+5);document.getElementById("feedback").textContent="⭐ 使用經驗藥水：接下來 5 次答對 XP ×1.5！";save();renderSupplyBar();}
+
+function nextQuestion(){
+ const justFinished=run.index;
+ const endZone=(justFinished+1)%5===0;
+ if(endZone){
+   const z=ZONE_ORDER[Math.floor(justFinished/5)];
+   if(!run.zoneRewards.includes(z)){
+     run.zoneRewards.push(z);
+     let reward=25,desc="區域寶箱開啟！";run.life=Math.min(maxHp(),run.life+1);desc+=" ❤️ 恢復 1 點生命。";
+     if(!(run.zoneMistakes[z]>0)){reward+=10;desc+=" ✨ 完美通關 +10 金幣。";}
+     let loot="";
+     if(z==="boss"){reward+=50;profile.inventory.revive=(profile.inventory.revive||0)+1;profile.inventory.xpPotion=(profile.inventory.xpPotion||0)+1;loot="🪶 復活羽毛 ×1、⭐ 經驗藥水 ×1";desc+=" 👑 擊敗 Boss +50 金幣。";}
+     else{
+       const roll=Math.random();
+       if(roll<.55){profile.inventory.heartPotion=(profile.inventory.heartPotion||0)+1;loot="❤️ 補血藥水 ×1";}
+       else if(roll<.88){profile.inventory.xpPotion=(profile.inventory.xpPotion||0)+1;loot="⭐ 經驗藥水 ×1";}
+       else{profile.inventory.revive=(profile.inventory.revive||0)+1;loot="🪶 復活羽毛 ×1";}
+     }
+     if(loot)desc+=`<br><b>🎁 掉落：${loot}</b>`;
+     profile.coins+=reward;
+     showReward(ZONES[z].label+" CLEAR!",reward,desc);
+     if(STORY.zoneClear?.[z]){openDialogue([STORY.zoneClear[z]], `clear_${z}`, "story-end");}
+   }
+ }
+ if(justFinished>=29){
+   run.finished=true;profile.totalClears++;save();renderGame();return;
+ }
+ run.index++;run.answered=false;run.correct=false;run.disabled=[];run.attempts=0;if(run.life===0)run.life=Math.max(2,Math.ceil(maxHp()/2));save();renderGame();
+}
+function showReward(title,coins,desc){
+ document.getElementById("rewardTitle").textContent=title;
+ document.getElementById("rewardCoins").textContent=`🪙 +${coins}`;
+ document.getElementById("rewardDesc").innerHTML=desc;
+ document.getElementById("rewardModal").classList.add("show");updateWallet();
+}
+function showResult(){
+ document.getElementById("gameCard").style.display="none";document.getElementById("resultCard").style.display="block";document.getElementById("progressBar").style.width="100%";
+ let title=run.xp>=400?"👑 協同挑戰王":run.xp>=330?"⚔️ 數學勇者":run.xp>=260?"🏅 成功破關":"🌱 冒險學徒";
+ document.getElementById("resultTitle").textContent=title;
+ document.getElementById("resultText").textContent=`本局獲得 ${run.xp} XP，勇者目前 Lv.${playerLevel()}；錯題 ${run.wrongIds.length} 題。共有 ${profile.coins} 金幣，可以去商店強化裝備與補給。`;
+ document.getElementById("levelText").textContent="30 / 30";
+}
+function startNew(){
+ if(!confirm("要換一局新的 30 題嗎？金幣、裝備和錯題本都會保留。"))return;
+ run=newRunData();save();renderGame();
+}
+function renderShop(){
+ updateWallet();const grid=document.getElementById("shopGrid");grid.innerHTML="";
+ SHOP.forEach(it=>{
+  const own=profile.owned.includes(it.id),eq=profile.equipped[it.type]===it.id,d=document.createElement("div"),bonus=ITEM_BONUS[it.id]?.text||"外觀裝備";
+  d.className="panel item"+(own?" owned":"")+(eq?" equipped":"");
+  d.innerHTML=`<div class="item-icon">${it.icon}</div><div class="item-name">${it.name}</div><div class="item-type">${it.type==="hat"?"帽子":it.type==="outfit"?"服裝":"配件"}</div><div class="bonus">${bonus}</div><div class="price">${own?"已擁有":"🪙 "+it.price}</div>`;
+  const b=document.createElement("button");b.className="btn "+(eq?"secondary":"primary");b.textContent=eq?"穿戴中":own?"穿上":"購買";b.disabled=eq;
+  b.addEventListener("click",()=>{if(own){profile.equipped[it.type]=it.id;}else if(profile.coins>=it.price){profile.coins-=it.price;profile.owned.push(it.id);profile.equipped[it.type]=it.id;}else{alert("金幣還不夠，先去闖關賺金幣吧！");return;}run.life=Math.min(run.life,maxHp());save();renderShop();renderAvatar();renderWardrobe();renderRpgStats();});
+  d.appendChild(b);grid.appendChild(d);
+ });
+ renderSupplyShop();
+}
+function renderSupplyShop(){
+ const grid=document.getElementById("supplyGrid");grid.innerHTML="";
+ SUPPLIES.forEach(it=>{
+  const d=document.createElement("div");d.className="panel supply-card";const isCrystal=it.id==="lifeCrystal",used=profile.permanentHp||0,price=isCrystal?it.price+used*40:it.price;
+  d.innerHTML=`<div class="item-icon">${it.icon}</div><div class="item-name">${it.name}</div><div class="supply-desc">${it.desc}</div><div class="price">${isCrystal?`已強化 ${used}/3　`:"持有 "+(profile.inventory[it.id]||0)+"　"}🪙 ${price}</div>`;
+  const b=document.createElement("button");b.className="btn primary";b.textContent=isCrystal?(used>=3?"已達上限":"強化生命"):"購買";b.disabled=isCrystal&&used>=3;
+  b.addEventListener("click",()=>{if(profile.coins<price){alert("金幣還不夠，先去冒險吧！");return;}profile.coins-=price;if(isCrystal){profile.permanentHp=Math.min(3,(profile.permanentHp||0)+1);run.life=Math.min(maxHp(),run.life+1);}else profile.inventory[it.id]=(profile.inventory[it.id]||0)+1;save();renderShop();renderSupplyBar();renderRpgStats();updateWallet();});d.appendChild(b);grid.appendChild(d);
+ });
+}
+
+function renderWardrobe(){
+ renderAvatar();const list=document.getElementById("ownedList");list.innerHTML="";
+ ["hat","outfit","acc"].forEach(type=>{
+  const title=document.createElement("div");title.style.gridColumn="1/-1";title.innerHTML=`<b>${type==="hat"?"🎩 帽子":type==="outfit"?"👕 服裝":"🗡️ 配件"}</b>`;list.appendChild(title);
+  ALL_ITEMS.filter(x=>x.type===type&&profile.owned.includes(x.id)).forEach(it=>{
+   const b=document.createElement("button");b.className="owned-btn"+(profile.equipped[type]===it.id?" on":"");b.innerHTML=`<span style="font-size:25px">${it.icon||"◯"}</span> <b>${it.name}</b>`;
+   b.addEventListener("click",()=>{profile.equipped[type]=it.id;run.life=Math.min(run.life,maxHp());save();renderWardrobe();renderAvatar();renderShop();renderRpgStats();});
+   list.appendChild(b);
+  });
+ });
+}
+function renderWrong(){
+ const box=document.getElementById("wrongList"),entries=Object.entries(profile.wrong).sort((a,b)=>b[1]-a[1]);box.innerHTML="";
+ if(!entries.length){box.innerHTML='<div class="panel empty">目前還沒有錯題 🎉</div>';return}
+ entries.forEach(([id,count])=>{
+  const q=QUESTIONS.find(x=>x.id===id);if(!q)return;
+  const d=document.createElement("div");d.className="panel wrong-item";
+  d.innerHTML=`<b>${ZONES[q.zone].label}｜錯 ${count} 次</b><div>${q.q}</div><div class="tiny">正確答案：${q.answer}<br>提示：${q.hint}</div>`;
+  box.appendChild(d);
+ });
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+ b.classList.add("active");document.getElementById(b.dataset.screen).classList.add("active");
+ if(b.dataset.screen==="shop")renderShop();if(b.dataset.screen==="wardrobe")renderWardrobe();if(b.dataset.screen==="wrong")renderWrong();
+}));
+document.getElementById("hintBtn").addEventListener("click",()=>{const q=qNow();document.getElementById("hint").textContent="提示："+q.hint;document.getElementById("hint").style.display="block";});
+document.getElementById("nextBtn").addEventListener("click",nextQuestion);
+document.getElementById("newRunBtn").addEventListener("click",startNew);
+document.getElementById("againBtn").addEventListener("click",()=>{run=newRunData();save();renderGame();});
+document.getElementById("rewardOk").addEventListener("click",()=>document.getElementById("rewardModal").classList.remove("show"));
+document.getElementById("dialogueNext").addEventListener("click",()=>{
+ const d=run.pendingDialogue;if(!d)return;
+ if(d.idx<d.lines.length-1){d.idx++;showDialogueLine();}
+ else{closeDialogue();}
+});
+document.getElementById("heartPotionBtn").addEventListener("click",useHeartPotion);
+document.getElementById("xpPotionBtn").addEventListener("click",useXpPotion);
+document.getElementById("reviveInfoBtn").addEventListener("click",()=>{document.getElementById("feedback").textContent="🪶 復活羽毛會在生命歸零時自動使用，不需要手動按。";});
+
+renderGame();renderShop();renderWardrobe();renderWrong();renderRpgStats();renderSupplyBar();
+
+if(!STORAGE_OK){
+ const ps=document.getElementById("playStatus");
+ ps.style.display="block";
+ ps.innerHTML="<b>目前是本機／預覽模式：</b>遊戲可以玩，但這個環境可能無法永久保存金幣與進度。放到 GitHub Pages 後就會正常保存。";
+}
+if("serviceWorker" in navigator && location.protocol!=="file:"){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+</script>
+</body>
+</html>
